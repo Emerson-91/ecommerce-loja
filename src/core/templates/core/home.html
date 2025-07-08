@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sua Loja de Roupas Online - Home</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Sua Loja de Roupas Online</h1>
+    </header>
+
+    <nav>
+        <a href="/">Home</a>
+        <a href="/produtos">Produtos</a> <a href="/carrinho">Carrinho</a> <a href="/dashboard">Dashboard</a>
+        <a href="/admin">Admin</a>
+    </nav>
+
+    <div class="container">
+        <section class="hero-section">
+            <h2>Novas Coleções Chegando!</h2>
+            <p>Descubra as últimas tendências da moda e renove seu guarda-roupa.</p>
+            <button style="padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Ver Produtos</button>
+        </section>
+
+        <h2>Produtos em Destaque</h2>
+        <div class="product-grid">
+            <div class="product-card">
+                <img src="https://via.placeholder.com/250x200?text=Camisa" alt="Camisa Masculina">
+                <h3>Camisa Masculina Casual</h3>
+                <p>R$ 99,90</p>
+            </div>
+            <div class="product-card">
+                <img src="https://via.placeholder.com/250x200?text=Vestido" alt="Vestido Florido">
+                <h3>Vestido Floral Verão</h3>
+                <p>R$ 149,90</p>
+            </div>
+            <div class="product-card">
+                <img src="https://via.placeholder.com/250x200?text=Calca" alt="Calça Jeans">
+                <h3>Calça Jeans Slim Fit</h3>
+                <p>R$ 129,90</p>
+            </div>
+            <div class="product-card">
+                <img src="https://via.placeholder.com/250x200?text=Tenis" alt="Tênis Esportivo">
+                <h3>Tênis Esportivo Leve</h3>
+                <p>R$ 199,90</p>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Sua Loja de Roupas Online. Todos os direitos reservados.</p>
+    </footer>
+</body>
+</html>
