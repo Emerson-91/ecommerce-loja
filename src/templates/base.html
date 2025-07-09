@@ -1,0 +1,72 @@
+﻿{# src/templates/base.html #}
+{% load static %} {# Carrega as tags de arquivos estáticos do Django #}
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Minha Loja de Roupas Online{% endblock %}</title>
+
+    {# Bootstrap CSS CDN (Coloque no HEAD) #}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+    {# SEU CSS CUSTOMIZADO (opcional, se for criar um arquivo style.css próprio) #}
+    {# Exemplo: <link rel="stylesheet" href="{% static 'css/style.css' %}"> #}
+
+    {% block extra_css %}{% endblock %} {# Para CSS específico de uma página #}
+</head>
+<body class="bg-light"> {# Classe Bootstrap para um fundo cinza claro #}
+
+    {# Cabeçalho com Navbar do Bootstrap #}
+    <header class="bg-white shadow-sm py-3">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg navbar-light">
+                <a class="navbar-brand" href="{% url 'core:home' %}">
+                    <img src="/media/logo-loja.png"
+                        alt="Minha Loja"
+                        class="d-inline-block align-text-top"
+                        style="height: 100px; object-fit: contain;">
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto"> {# ms-auto para alinhar à direita #}
+                        <li class="nav-item"><a class="nav-link active" aria-current="page" href="{% url 'core:home' %}">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Produtos</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Categorias</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Minha Conta</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#">Carrinho</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'admin:index' %}">Admin</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </div>
+    </header>
+
+    {# Conteúdo principal da página #}
+    <main class="container my-4"> {# my-4 adiciona margem superior e inferior #}
+        {% block content %}
+        {# Conteúdo específico de cada página virá aqui #}
+        {% endblock %}
+    </main>
+
+    {# Rodapé do Bootstrap #}
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p>&copy; 2025 Minha Loja de Roupas Online. Todos os direitos reservados.</p>
+            <ul class="list-inline mt-2">
+                <li class="list-inline-item"><a href="#" class="text-white text-decoration-none">Sobre Nós</a></li>
+                <li class="list-inline-item"><a href="#" class="text-white text-decoration-none">Contato</a></li>
+                <li class="list-inline-item"><a href="#" class="text-white text-decoration-none">Política de Privacidade</a></li>
+            </ul>
+        </div>
+    </footer>
+
+    {# Bootstrap JS CDN (Coloque antes do fechamento da tag BODY) #}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+    {% block extra_js %}{% endblock %} {# Para JS específico de uma página #}
+</body>
+</html>
