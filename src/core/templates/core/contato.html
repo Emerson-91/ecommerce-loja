@@ -1,1 +1,47 @@
-﻿
+﻿{% extends 'base.html' %}
+
+{% block title %}Contato{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row">
+        <!-- Coluna 1: Contatos -->
+        <div class="col-md-6 mb-4 mb-md-0">
+            <h2 class="mb-4">Entre em Contato</h2>
+
+            <p class="mb-3">
+                <strong>WhatsApp:</strong>
+                <a href="https://wa.me/5599999999999" target="_blank" class="text-decoration-none">
+                    (99) 99999-9999
+                </a>
+            </p>
+
+            <p class="mb-3">
+                <strong>E-mail:</strong>
+                <a href="mailto:contato@seudominio.com" class="text-decoration-none">
+                    contato@seudominio.com
+                </a>
+            </p>
+
+            <p class="mb-3">
+                <strong>Endereço:</strong><br>
+                Rua Fátima do Sul, 31<br>
+                Campo Grande - MS
+            </p>
+        </div>
+
+        <!-- Coluna 2: Mapa -->
+        <div class="col-md-6">
+            <div class="ratio ratio-4x3 shadow rounded">
+                <iframe
+                    src="https://www.google.com/maps?q=Rua+Fátima+do+Sul,+31,+Campo+Grande,+MS&output=embed"
+                    style="border:0;"
+                    allowfullscreen
+                    loading="lazy"
+                    referrerpolicy="no-referrer-when-downgrade">
+                </iframe>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

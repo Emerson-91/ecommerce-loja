@@ -26,7 +26,10 @@ SECRET_KEY = 'django-insecure-#t!j#3gyoa0*je58c6a86w3ig8h84oabi$&mlyr!&e^*(f+br(
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '192.168.1.14',  # IP do servidor local
+    'localhost',  # Permite acesso local
+]
 
 
 # Application definition
@@ -45,6 +48,8 @@ INSTALLED_APPS = [
     'usuarios',
     'pagamentos',
     'administracao',
+    'carrinho',
+    'tagplus',
 ]
 
 MIDDLEWARE = [

@@ -6,7 +6,7 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('core.urls')),
-    # path('dashboard/', include('dashboard.urls')),  # Removido pois o app foi excluído
+    #path('produtos/', include('produtos.urls')),    
 ]
 
 if settings.DEBUG:
