@@ -50,6 +50,9 @@ INSTALLED_APPS = [
     'administracao',
     'carrinho',
     'tagplus',
+
+    'django_extensions',
+
 ]
 
 MIDDLEWARE = [
@@ -67,7 +70,7 @@ ROOT_URLCONF = 'ecommerce_loja.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')], 
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -133,11 +136,13 @@ MEDIA_ROOT = BASE_DIR.parent / 'media'
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR.parent, 'static'), # Isso aponta para a pasta 'static' na raiz do projeto
+    # Isso aponta para a pasta 'static' na raiz do projeto
+    os.path.join(BASE_DIR.parent, 'static'),
 ]
 
 # Onde o Django DEVE COLETAR arquivos estáticos para PRODUÇÃO
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Nome da pasta para coletar em produção
+# Nome da pasta para coletar em produção
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field

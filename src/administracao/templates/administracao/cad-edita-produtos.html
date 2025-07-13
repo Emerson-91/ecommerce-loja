@@ -1,0 +1,226 @@
+﻿{% extends 'administracao/base_admin.html' %}
+{% load form_extras %}
+
+{% block content %}
+<h2>{% if produto %}Editar{% else %}Cadastrar{% endif %} Produto</h2>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Campos do produto -->
+    {% for field in form %}
+        <div class="mb-3">
+            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+            {{ field|add_class:"form-control" }}
+            {% if field.help_text %}
+                <div class="form-text">{{ field.help_text }}</div>
+            {% endif %}
+            {% for error in field.errors %}
+                <div class="text-danger small">{{ error }}</div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <!-- Preview da imagem principal -->
+    <div class="mb-3">
+        <label class="form-label">Preview da Imagem Principal</label><br>
+        <img id="preview" src="{% if produto and produto.imagem_principal %}{{ produto.imagem_principal.url }}{% endif %}" style="max-height: 150px;" />
+    </div>
+
+    <!-- Campo Grade -->
+    <div class="mb-3">
+        <label for="{{ form.grade_tamanho.id_for_label }}" class="form-label">Grade de Tamanho</label>
+        {{ form.grade_tamanho }}
+        {% for error in form.grade_tamanho.errors %}
+            <div class="text-danger small">{{ error }}</div>
+        {% endfor %}
+    </div>
+
+    <!-- Tipo de Grade Selecionado -->
+    <div class="mb-3">
+        <label class="form-label">Tipo de Grade Selecionado:</label>
+        <span id="tipo-grade" class="fw-bold">
+            {% if produto and produto.grade_tamanho %}
+                {{ produto.grade_tamanho.get_tipo_display }}
+            {% endif %}
+        </span>
+    </div>
+
+    <hr>
+    <h5>Variações</h5>
+    {{ variacoes_formset.management_form }}
+    <div id="variacoes-container">
+        {% for form in variacoes_formset %}
+            <div class="row g-3 mb-2 border p-2 rounded variacao-form">
+                {% for field in form %}
+                    <div class="col-md-4">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {% if field.name == "tamanho" %}
+                            {{ field|add_class:"form-select" }}
+                        {% else %}
+                            {{ field|add_class:"form-control" }}
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+                <div class="col-md-2 d-flex align-items-end">
+                    {% if form.instance.pk or form.can_delete %}
+                        {{ form.DELETE }}
+                        <button type="button" class="btn btn-danger btn-sm remove-variacao">Remover</button>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="button" id="add-variacao" class="btn btn-secondary mt-2">Adicionar Variação</button>
+
+    <hr>
+
+    <h5>Imagens Adicionais</h5>
+    {{ imagens_formset.management_form }}
+    {% for form in imagens_formset %}
+        <div class="row g-3 mb-2 border p-2 rounded">
+            {% for field in form %}
+                <div class="col-md-6">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field|add_class:"form-control" }}
+                    {% for error in field.errors %}
+                        <div class="text-danger small">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <button type="submit" class="btn btn-success mt-3">Salvar Produto</button>
+</form>
+
+<style>
+    .variacao-form input[type="checkbox"][name$="-DELETE"] {
+        display: none;
+    }
+</style>
+
+<script>
+function previewImagem(input) {
+    const preview = document.getElementById('preview');
+    const file = input.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+// Preencher tamanhos de acordo com grade selecionada
+function preencherTamanhos(gradeId) {
+    fetch(`/administracao/ajax/carregar-grades/?tipo=all`)
+        .then(response => response.json())
+        .then(data => {
+            const grade = data.find(g => g.id == gradeId || g.id == parseInt(gradeId));
+            if (!grade) return;
+            const tamanhos = grade.tamanhos.split(',').map(t => t.trim());
+
+            const selects = document.querySelectorAll('select[name$="-tamanho"]');
+            selects.forEach(select => {
+                const valorAnterior = select.value;
+                select.innerHTML = '<option value="">--- Selecione ---</option>';
+                tamanhos.forEach(t => {
+                    const opt = document.createElement('option');
+                    opt.value = t;
+                    opt.text = t;
+                    select.appendChild(opt);
+                });
+                if (valorAnterior) select.value = valorAnterior;
+            });
+        });
+}
+
+function atualizarTipoGrade(gradeId) {
+    fetch(`/administracao/ajax/carregar-grades/?tipo=all`)
+        .then(response => response.json())
+        .then(data => {
+            const grade = data.find(g => g.id == parseInt(gradeId));
+            if (!grade) {
+                document.getElementById('tipo-grade').textContent = '';
+                return;
+            }
+            document.getElementById('tipo-grade').textContent = grade.tipo_display;
+        });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const gradeSelect = document.querySelector('select[name="grade_tamanho"]');
+    if (gradeSelect) {
+        gradeSelect.addEventListener('change', function () {
+            const gradeId = this.value;
+            if (gradeId) {
+                preencherTamanhos(gradeId);
+                atualizarTipoGrade(gradeId);
+            }
+        });
+
+        if (gradeSelect.value) {
+            preencherTamanhos(gradeSelect.value);
+            atualizarTipoGrade(gradeSelect.value);
+        }
+    }
+
+    // Preview imagem ao escolher
+    const inputImagem = document.querySelector('input[name="imagem_principal"]');
+    if (inputImagem) {
+        inputImagem.addEventListener('change', function () {
+            previewImagem(this);
+        });
+    }
+
+    // Adicionar nova variação
+    const addBtn = document.getElementById('add-variacao');
+    if (addBtn) {
+        addBtn.addEventListener('click', function () {
+            const container = document.getElementById('variacoes-container');
+            const forms = container.querySelectorAll('.variacao-form');
+            const totalForms = document.querySelector('input[name="form-TOTAL_FORMS"]');
+            const formNum = forms.length;
+
+            // Clona o último form
+            const lastForm = forms[forms.length - 1];
+            const newForm = lastForm.cloneNode(true);
+
+            // Limpa os valores
+            newForm.querySelectorAll('input, select').forEach(function (input) {
+                if (input.type === 'checkbox') {
+                    input.checked = false;
+                } else {
+                    input.value = '';
+                }
+            });
+
+            // Atualiza os índices dos campos
+            newForm.innerHTML = newForm.innerHTML.replace(/form-(\d)-/g, `form-${formNum}-`);
+            container.appendChild(newForm);
+
+            // Atualiza o total de forms
+            totalForms.value = formNum + 1;
+        });
+    }
+
+    // Remover variação
+    document.getElementById('variacoes-container').addEventListener('click', function (e) {
+        if (e.target.classList.contains('remove-variacao')) {
+            const form = e.target.closest('.variacao-form');
+            const deleteInput = form.querySelector('input[type="checkbox"][name$="-DELETE"]');
+            if (deleteInput) {
+                deleteInput.checked = true;
+                form.style.display = 'none';
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,58 @@
+﻿{% extends 'administracao/base_admin.html' %}
+
+{% block content %}
+<h2>Lista de Produtos</h2>
+
+<form method="get" class="row mb-3">
+    <div class="col-sm-6">
+        <input type="text" name="q" class="form-control" placeholder="Buscar por nome ou código" value="{{ busca }}">
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Buscar</button>
+        <a href="{% url 'administracao:cadastro_produto' %}" class="btn btn-success">+ Novo Produto</a>
+    </div>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Código</th>
+            <th>Nome</th>
+            <th>Preço</th>
+            <th>Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for produto in produtos %}
+        <tr>
+            <td>{{ produto.codigo_interno }}</td>
+            <td>{{ produto.nome }}</td>
+            <td>R$ {{ produto.valor_venda }}</td>
+            <td>
+                <a href="{% url 'administracao:editar_produto' produto.id %}" class="btn btn-sm btn-warning">Editar</a>
+                <a href="{% url 'administracao:excluir_produto' produto.id %}" class="btn btn-sm btn-danger">Excluir</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Nenhum produto encontrado.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Paginação -->
+<nav>
+  <ul class="pagination">
+    {% if produtos.has_previous %}
+      <li class="page-item"><a class="page-link" href="?page={{ produtos.previous_page_number }}&q={{ busca }}">Anterior</a></li>
+    {% endif %}
+    {% for num in produtos.paginator.page_range %}
+      <li class="page-item {% if num == produtos.number %}active{% endif %}">
+        <a class="page-link" href="?page={{ num }}&q={{ busca }}">{{ num }}</a>
+      </li>
+    {% endfor %}
+    {% if produtos.has_next %}
+      <li class="page-item"><a class="page-link" href="?page={{ produtos.next_page_number }}&q={{ busca }}">Próxima</a></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endblock %}

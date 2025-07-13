@@ -1,0 +1,12 @@
+﻿{% extends 'administracao/base_admin.html' %}
+
+{% block content %}
+<h2>Confirmar Exclusão</h2>
+<p>Tem certeza que deseja desativar o produto <strong>{{ produto.nome }}</strong>?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Confirmar</button>
+    <a href="{% url 'administracao:lista_produtos' %}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}
