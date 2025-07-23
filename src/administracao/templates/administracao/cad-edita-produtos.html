@@ -1,103 +1,134 @@
 ﻿{% extends 'administracao/base_admin.html' %}
 {% load form_extras %}
 
-{% block content %}
-<h2>{% if produto %}Editar{% else %}Cadastrar{% endif %} Produto</h2>
+{% block title %}{% if produto %}Editar{% else %}Cadastrar{% endif %} Produto{% endblock %}
 
-<form method="post" enctype="multipart/form-data">
+{% block content %}
+<h1 class="text-3xl font-bold text-gray-900 mb-8">
+    {% if produto %}Editar{% else %}Cadastrar{% endif %} Produto
+</h1>
+
+<form method="post" enctype="multipart/form-data" class="space-y-10">
     {% csrf_token %}
 
-    <!-- Campos do produto -->
-    {% for field in form %}
-        <div class="mb-3">
-            <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-            {{ field|add_class:"form-control" }}
-            {% if field.help_text %}
-                <div class="form-text">{{ field.help_text }}</div>
-            {% endif %}
-            {% for error in field.errors %}
-                <div class="text-danger small">{{ error }}</div>
+    <!-- Campos principais -->
+    <section class="bg-white p-6 rounded-xl shadow border border-gray-200">
+        <h2 class="text-xl font-semibold mb-6 text-gray-800">Dados do Produto</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for field in form %}
+            <div class="space-y-1">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                {{ field|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" }}
+                {% if field.help_text %}
+                    <p class="text-xs text-gray-500">{{ field.help_text }}</p>
+                {% endif %}
+                {% if field.errors %}
+                    {% for error in field.errors %}
+                    <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                    {% endfor %}
+                {% endif %}
+            </div>
             {% endfor %}
         </div>
-    {% endfor %}
 
-    <!-- Preview da imagem principal -->
-    <div class="mb-3">
-        <label class="form-label">Preview da Imagem Principal</label><br>
-        <img id="preview" src="{% if produto and produto.imagem_principal %}{{ produto.imagem_principal.url }}{% endif %}" style="max-height: 150px;" />
-    </div>
+        <!-- Preview da imagem principal -->
+        <div class="mt-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Preview da Imagem Principal</label>
+            <img id="preview" src="{% if produto and produto.imagem_principal %}{{ produto.imagem_principal.url }}{% endif %}" alt="Preview imagem" class="max-h-40 rounded-md border border-gray-300 shadow-sm">
+        </div>
 
-    <!-- Campo Grade -->
-    <div class="mb-3">
-        <label for="{{ form.grade_tamanho.id_for_label }}" class="form-label">Grade de Tamanho</label>
-        {{ form.grade_tamanho }}
-        {% for error in form.grade_tamanho.errors %}
-            <div class="text-danger small">{{ error }}</div>
-        {% endfor %}
-    </div>
+        <!-- Grade -->
+        <div class="mt-6">
+            <label for="{{ form.grade_tamanho.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Grade de Tamanho</label>
+            {{ form.grade_tamanho|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" }}
+            {% for error in form.grade_tamanho.errors %}
+                <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+            {% endfor %}
+        </div>
 
-    <!-- Tipo de Grade Selecionado -->
-    <div class="mb-3">
-        <label class="form-label">Tipo de Grade Selecionado:</label>
-        <span id="tipo-grade" class="fw-bold">
-            {% if produto and produto.grade_tamanho %}
-                {{ produto.grade_tamanho.get_tipo_display }}
-            {% endif %}
-        </span>
-    </div>
+        <!-- Tipo de Grade -->
+        <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Grade Selecionado:</label>
+            <span id="tipo-grade" class="inline-block font-semibold text-indigo-600">
+                {% if produto and produto.grade_tamanho %}
+                    {{ produto.grade_tamanho.get_tipo_display }}
+                {% endif %}
+            </span>
+        </div>
+    </section>
 
-    <hr>
-    <h5>Variações</h5>
-    {{ variacoes_formset.management_form }}
-    <div id="variacoes-container">
-        {% for form in variacoes_formset %}
-            <div class="row g-3 mb-2 border p-2 rounded variacao-form">
+    <!-- Variações -->
+    <section class="bg-white p-6 rounded-xl shadow border border-gray-200">
+        <h2 class="text-xl font-semibold mb-6 text-gray-800">Variações</h2>
+
+        {{ variacoes_formset.management_form }}
+
+        <div id="variacoes-container" class="space-y-4">
+            {% for form in variacoes_formset %}
+            <div class="variacao-form border border-gray-300 rounded-lg bg-gray-50 p-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
                 {% for field in form %}
-                    <div class="col-md-4">
-                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                        {% if field.name == "tamanho" %}
-                            {{ field|add_class:"form-select" }}
-                        {% else %}
-                            {{ field|add_class:"form-control" }}
-                        {% endif %}
+                <div class="space-y-1">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                    {% if field.name == "tamanho" %}
+                        {{ field|add_class:"form-select w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" }}
+                    {% else %}
+                        {{ field|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" }}
+                    {% endif %}
+                    {% if field.errors %}
                         {% for error in field.errors %}
-                            <div class="text-danger small">{{ error }}</div>
+                        <p class="text-sm text-red-600 mt-1">{{ error }}</p>
                         {% endfor %}
-                    </div>
+                    {% endif %}
+                </div>
                 {% endfor %}
-                <div class="col-md-2 d-flex align-items-end">
+                <div class="flex justify-center md:justify-start">
                     {% if form.instance.pk or form.can_delete %}
-                        {{ form.DELETE }}
-                        <button type="button" class="btn btn-danger btn-sm remove-variacao">Remover</button>
+                    {{ form.DELETE }}
+                    <button type="button" class="text-red-600 hover:underline text-sm remove-variacao" aria-label="Remover variação">Remover</button>
                     {% endif %}
                 </div>
             </div>
-        {% endfor %}
-    </div>
-    <button type="button" id="add-variacao" class="btn btn-secondary mt-2">Adicionar Variação</button>
-
-    <hr>
-
-    <h5>Imagens Adicionais</h5>
-    {{ imagens_formset.management_form }}
-    {% for form in imagens_formset %}
-        <div class="row g-3 mb-2 border p-2 rounded">
-            {% for field in form %}
-                <div class="col-md-6">
-                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
-                    {{ field|add_class:"form-control" }}
-                    {% for error in field.errors %}
-                        <div class="text-danger small">{{ error }}</div>
-                    {% endfor %}
-                </div>
             {% endfor %}
         </div>
-    {% endfor %}
 
-    <button type="submit" class="btn btn-success mt-3">Salvar Produto</button>
+        <button type="button" id="add-variacao" class="mt-4 inline-block px-5 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition text-sm">
+            + Adicionar Variação
+        </button>
+    </section>
+
+    <!-- Imagens adicionais -->
+    <section class="bg-white p-6 rounded-xl shadow border border-gray-200">
+        <h2 class="text-xl font-semibold mb-6 text-gray-800">Imagens Adicionais</h2>
+
+        {{ imagens_formset.management_form }}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for form in imagens_formset %}
+                {% for field in form %}
+                <div class="space-y-1">
+                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
+                    {{ field|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" }}
+                    {% if field.errors %}
+                        {% for error in field.errors %}
+                        <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {% endfor %}
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Botão salvar -->
+    <div>
+        <button type="submit" class="w-full md:w-auto px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded shadow transition">
+            Salvar Produto
+        </button>
+    </div>
 </form>
 
 <style>
+    /* Esconder checkbox de DELETE, mas manter funcional */
     .variacao-form input[type="checkbox"][name$="-DELETE"] {
         display: none;
     }
@@ -117,7 +148,6 @@ function previewImagem(input) {
     }
 }
 
-// Preencher tamanhos de acordo com grade selecionada
 function preencherTamanhos(gradeId) {
     fetch(`/administracao/ajax/carregar-grades/?tipo=all`)
         .then(response => response.json())
@@ -125,7 +155,6 @@ function preencherTamanhos(gradeId) {
             const grade = data.find(g => g.id == gradeId || g.id == parseInt(gradeId));
             if (!grade) return;
             const tamanhos = grade.tamanhos.split(',').map(t => t.trim());
-
             const selects = document.querySelectorAll('select[name$="-tamanho"]');
             selects.forEach(select => {
                 const valorAnterior = select.value;
@@ -171,7 +200,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Preview imagem ao escolher
     const inputImagem = document.querySelector('input[name="imagem_principal"]');
     if (inputImagem) {
         inputImagem.addEventListener('change', function () {
@@ -188,12 +216,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const totalForms = document.querySelector('input[name="form-TOTAL_FORMS"]');
             const formNum = forms.length;
 
+            if (forms.length === 0) return;
+
             // Clona o último form
             const lastForm = forms[forms.length - 1];
             const newForm = lastForm.cloneNode(true);
 
-            // Limpa os valores
-            newForm.querySelectorAll('input, select').forEach(function (input) {
+            // Limpa valores dos inputs e selects
+            newForm.querySelectorAll('input, select').forEach(input => {
                 if (input.type === 'checkbox') {
                     input.checked = false;
                 } else {
@@ -201,11 +231,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
 
-            // Atualiza os índices dos campos
-            newForm.innerHTML = newForm.innerHTML.replace(/form-(\d)-/g, `form-${formNum}-`);
+            // Atualiza os índices dos campos (form-0-, form-1- etc)
+            newForm.innerHTML = newForm.innerHTML.replace(/form-(\d+)-/g, `form-${formNum}-`);
+
+            // Esconde o checkbox de DELETE (deixe marcado como false)
+            const deleteInput = newForm.querySelector('input[type="checkbox"][name$="-DELETE"]');
+            if (deleteInput) {
+                deleteInput.checked = false;
+            }
+
             container.appendChild(newForm);
 
-            // Atualiza o total de forms
+            // Atualiza total de forms
             totalForms.value = formNum + 1;
         });
     }

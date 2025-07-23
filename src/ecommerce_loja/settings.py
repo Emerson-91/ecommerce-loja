@@ -28,6 +28,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     '192.168.1.14',  # IP do servidor local
+    '127.0.0.1',
     'localhost',  # Permite acesso local
 ]
 
@@ -50,10 +51,16 @@ INSTALLED_APPS = [
     'administracao',
     'carrinho',
     'tagplus',
-
+    
+    
+    'tailwind',
+    'theme',
     'django_extensions',
 
 ]
+
+TAILWIND_APP_NAME = 'theme'
+INTERNAL_IPS = ['127.0.0.1']
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

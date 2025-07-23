@@ -1,67 +1,140 @@
-﻿<!DOCTYPE html>
-<html lang="pt-br">
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Painel Administrativo</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Painel Admin{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4f46e5',
+                        secondary: '#f43f5e',
+                        dark: '#1e293b',
+                        light: '#f8fafc'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Custom CSS opcional -->
     <style>
-        body { overflow-x: hidden; background-color: #f8f9fa; }
         .sidebar {
-            height: 100vh;
-            position: fixed;
-            width: 220px;
-            background-color: #343a40;
-            padding-top: 1rem;
+            transition: all 0.3s ease;
         }
-        .sidebar a {
-            color: #ddd;
-            padding: 12px 16px;
-            display: block;
-            text-decoration: none;
-            font-size: 15px;
-        }
-        .sidebar a:hover {
-            background-color: #495057;
-            color: #fff;
-        }
-        .sidebar h5 {
-            font-size: 18px;
-            margin-bottom: 1rem;
-        }
-        .content {
-            margin-left: 220px;
-            padding: 2rem;
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                position: absolute;
+                z-index: 50;
+                height: 100vh;
+            }
+            .sidebar.open {
+                transform: translateX(0);
+            }
+            .overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 40;
+            }
+            .overlay.open {
+                display: block;
+            }
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
 
-    <div class="sidebar">
-        <h5 class="text-white text-center">🛠 Painel</h5>
-        <a href="{% url 'administracao:painel_dashboard' %}">📊 Dashboard</a>
-        <a href="{% url 'administracao:lista_produtos' %}">📦 Produtos</a>
-    </div>
-
-    <div class="content">
-        <div class="container">
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
-
-            {% block content %}{% endblock %}
+<div class="flex h-screen overflow-hidden">
+    <!-- Sidebar -->
+    <div class="sidebar bg-dark text-white w-64 flex-shrink-0">
+        <div class="p-4 border-b border-gray-700">
+            <h1 class="text-2xl font-bold flex items-center">
+                <i class="fas fa-store mr-2"></i>
+                <span>Admin Loja</span>
+            </h1>
         </div>
+        <nav class="p-4">
+            <div class="mb-6">
+                <h3 class="text-xs uppercase text-gray-400 mb-3">Principal</h3>
+                <ul>
+                    <li class="mb-2">
+                        <a href="{% url 'administracao:painel_dashboard' %}" class="flex items-center p-2 rounded bg-primary text-white">
+                            <i class="fas fa-tachometer-alt mr-3"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="mb-6">
+                <h3 class="text-xs uppercase text-gray-400 mb-3">Gerenciamento</h3>
+                <ul>
+                    <li class="mb-2">
+                        <a href="{% url 'administracao:lista_produtos' %}" class="flex items-center p-2 rounded hover:bg-gray-700">
+                            <i class="fas fa-box-open mr-3"></i>
+                            Produtos
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
     </div>
 
-    <!-- Bootstrap JS (para alerts, dropdowns etc.) -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Mobile Overlay -->
+    <div class="overlay"></div>
+
+    <!-- Conteúdo Principal -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <!-- Topbar -->
+        <header class="bg-white shadow-sm">
+            <div class="flex items-center justify-between p-4">
+                <div class="flex items-center">
+                    <button id="sidebarToggle" class="md:hidden mr-4 text-gray-600">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                    <h2 class="text-xl font-semibold text-gray-800">Dashboard</h2>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-600 hover:text-gray-800">
+                        <i class="fas fa-bell text-xl"></i>
+                    </button>
+                    <div class="flex items-center space-x-2">
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="User" class="w-8 h-8 rounded-full">
+                        <span class="hidden md:inline text-gray-700">Admin</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Área de Conteúdo -->
+        <main class="flex-1 overflow-y-auto p-4 bg-gray-100">
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- JavaScript separado -->
+<script src="{% static 'theme/js/base_admin.js' %}"></script>
+
 </body>
 </html>

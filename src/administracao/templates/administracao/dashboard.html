@@ -1,6 +1,54 @@
 ﻿{% extends 'administracao/base_admin.html' %}
 
+
 {% block content %}
-<h1>Dashboard</h1>
-<p><a href="{% url 'administracao:lista_produtos' %}" class="btn btn-primary">Gerenciar Produtos</a></p>
+<h1 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+    <i class="fas fa-tachometer-alt mr-2 text-indigo-600"></i>
+    Painel Administrativo
+</h1>
+
+<!-- Cards principais -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+    <!-- Card: Produtos -->
+    <div class="bg-white p-6 rounded-2xl shadow border border-gray-200 hover:shadow-md transition">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                <i class="fas fa-box-open text-indigo-600 mr-2"></i>
+                Produtos
+            </h2>
+        </div>
+        <p class="text-gray-600 mb-6">Gerencie os produtos cadastrados na loja.</p>
+        <a href="{% url 'administracao:lista_produtos' %}" class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md font-medium">
+            Gerenciar Produtos
+        </a>
+    </div>
+
+    <!-- Card: Pedidos -->
+    <div class="bg-white p-6 rounded-2xl shadow border border-gray-200 opacity-70 cursor-not-allowed">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                <i class="fas fa-receipt text-gray-500 mr-2"></i>
+                Pedidos
+            </h2>
+        </div>
+        <p class="text-gray-600 mb-6">Acompanhe os pedidos realizados pelos clientes.</p>
+        <button disabled class="bg-gray-300 text-gray-600 px-4 py-2 rounded-md font-medium">
+            Em breve
+        </button>
+    </div>
+
+    <!-- Card: Relatórios -->
+    <div class="bg-white p-6 rounded-2xl shadow border border-gray-200 opacity-70 cursor-not-allowed">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-lg font-semibold text-gray-800 flex items-center">
+                <i class="fas fa-chart-bar text-gray-500 mr-2"></i>
+                Relatórios
+            </h2>
+        </div>
+        <p class="text-gray-600 mb-6">Visualize relatórios de vendas e desempenho.</p>
+        <button disabled class="bg-gray-300 text-gray-600 px-4 py-2 rounded-md font-medium">
+            Em breve
+        </button>
+    </div>
+</div>
 {% endblock %}
