@@ -1,0 +1,13 @@
+﻿version: '3.9'
+
+services:
+  web:
+    build: .
+    container_name: ecommerce_loja
+    volumes:
+      - .:/app           # Monta todo o projeto local dentro do container
+    working_dir: /app/src # Ponto onde o Django vai rodar (onde está manage.py)
+    ports:
+      - "8000:8000"      # Mapeia porta 8000 local para porta 8000 do container
+    environment:
+      - PYTHONUNBUFFERED=1 # Para não armazenar buffer na saída Python (logs ao vivo)
