@@ -14,23 +14,6 @@ def painel_dashboard(request):
     return render(request, 'administracao/dashboard.html')
 
 
-# Função para carregar tamanhos baseados no tipo de tamanho
-def carregar_tamanhos_tipo(request):
-    tipo = request.GET.get('tipo')
-    tamanhos = []
-
-    if tipo == 'NORMAL':
-        tamanhos = ['P', 'M', 'G', 'GG']
-    elif tipo == 'PLUS':
-        tamanhos = ['P', 'M', 'G', 'GG']
-    elif tipo == 'NUMERACAO':
-        tamanhos = ['36', '38', '40', '42', '44', '46']
-
-    return JsonResponse({
-        'tamanhos': [{'id': t, 'nome': t} for t in tamanhos]
-    })
-
-
 # Função para o cadastro de produto
 def cadastro_produto(request):
     VariacaoFormSet = inlineformset_factory(

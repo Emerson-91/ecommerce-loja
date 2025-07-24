@@ -12,7 +12,5 @@ urlpatterns = [
     path('produtos/excluir/<int:produto_id>/',
          views.excluir_produto, name='excluir_produto'),
 
-    # AJAX para tamanhos baseados no tipo
-    path('ajax/carregar-tamanhos-tipo/',
-         views.carregar_tamanhos_tipo, name='carregar_tamanhos_tipo'),
+
 ]

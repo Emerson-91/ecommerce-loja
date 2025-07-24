@@ -30,85 +30,6 @@
     </section>
 
     <!-- Variações -->
-    <script>
-const tamanhosPorTipo = {
-    'NORMAL': ['P', 'M', 'G', 'GG'],
-    'PLUS': ['P', 'M', 'G', 'GG'],
-    'NUMERACAO': ['36', '38', '40', '42', '44', '46']
-};
-
-function atualizarTamanhos(selectTipo, selectTamanho) {
-    const tipo = selectTipo.value || 'NORMAL'; // Garante valor padrão
-    const tamanhos = tamanhosPorTipo[tipo] || [];
-    const valorOriginal = selectTamanho.dataset.value || '';
-    selectTamanho.innerHTML = '';
-    const optDefault = document.createElement('option');
-    optDefault.value = '';
-    optDefault.textContent = '--- Selecione ---';
-    selectTamanho.appendChild(optDefault);
-    tamanhos.forEach(function(t) {
-        const opt = document.createElement('option');
-        opt.value = t;
-        opt.textContent = t;
-        selectTamanho.appendChild(opt);
-    });
-    // Restaura o valor original se existir
-    if (valorOriginal) {
-        selectTamanho.value = valorOriginal;
-    }
-}
-
-// Para todos os forms já renderizados
-document.querySelectorAll('.variacao-form').forEach(function(form) {
-    const selectTipo = form.querySelector('select[name$="tipo_tamanho"]');
-    const selectTamanho = form.querySelector('select[name$="tamanho"]');
-    if (selectTipo && selectTamanho) {
-        selectTipo.addEventListener('change', function() {
-            atualizarTamanhos(selectTipo, selectTamanho);
-        });
-        // Atualiza ao carregar a página
-        atualizarTamanhos(selectTipo, selectTamanho);
-    }
-});
-
-// Para novos forms adicionados
-document.getElementById('add-variacao').addEventListener('click', function() {
-    var container = document.getElementById('variacoes-container');
-    var totalForms = document.querySelector('[name="variacaoproduto_set-TOTAL_FORMS"]');
-    var currentCount = parseInt(totalForms.value);
-
-    var forms = container.querySelectorAll('.variacao-form');
-    var lastForm = forms[forms.length - 1];
-    var newForm = lastForm.cloneNode(true);
-
-    // Limpa os valores dos inputs e selects
-    newForm.querySelectorAll('input, select').forEach(function(input) {
-        if (input.type !== 'hidden') input.value = '';
-        if (input.type === 'checkbox') input.checked = false;
-    });
-
-    // Atualiza os índices dos campos
-    newForm.innerHTML = newForm.innerHTML.replace(
-        new RegExp('variacaoproduto_set-' + (currentCount - 1), 'g'),
-        'variacaoproduto_set-' + currentCount
-    );
-
-    container.appendChild(newForm);
-    totalForms.value = currentCount + 1;
-
-    // Atualiza o select de tamanho do novo form
-    setTimeout(function() {
-        const selectTipo = newForm.querySelector('select[name$="tipo_tamanho"]');
-        const selectTamanho = newForm.querySelector('select[name$="tamanho"]');
-        if (selectTipo && selectTamanho) {
-            atualizarTamanhos(selectTipo, selectTamanho);
-            selectTipo.addEventListener('change', function() {
-                atualizarTamanhos(selectTipo, selectTamanho);
-            });
-        }
-    }, 50);
-});
-</script>
     <section class="bg-white p-6 rounded-xl shadow border border-gray-200">
         <h2 class="text-xl font-semibold mb-6 text-gray-800">Variações</h2>
 
@@ -116,22 +37,10 @@ document.getElementById('add-variacao').addEventListener('click', function() {
 
         <div id="variacoes-container" class="space-y-4">
             {% for form in variacoes_formset %}
-            <div class="variacao-form border border-gray-300 rounded-lg bg-gray-50 p-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                <div class="space-y-1">
-                    <label for="{{ form.tipo_tamanho.id_for_label }}" class="block text-sm font-medium text-gray-700">Tipo de Tamanho</label>
-                    {{ form.tipo_tamanho|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" }}
-                    {% if form.tipo_tamanho.errors %}
-                        {% for error in form.tipo_tamanho.errors %}
-                        <p class="text-sm text-red-600 mt-1">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
+            <div class="variacao-form border border-gray-300 rounded-lg bg-gray-50 p-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
                 <div class="space-y-1">
                     <label for="{{ form.tamanho.id_for_label }}" class="block text-sm font-medium text-gray-700">Tamanho</label>
-                    <select name="{{ form.tamanho.html_name }}" id="{{ form.tamanho.id_for_label }}"
-    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
-    data-value="{{ form.tamanho.value }}">
-</select>
+                    {{ form.tamanho|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" }}
                     {% if form.tamanho.errors %}
                         {% for error in form.tamanho.errors %}
                         <p class="text-sm text-red-600 mt-1">{{ error }}</p>
@@ -173,5 +82,42 @@ document.getElementById('add-variacao').addEventListener('click', function() {
         </button>
     </div>
 </form>
+
+<script>
+    // Adiciona uma nova variação
+    document.getElementById('add-variacao').addEventListener('click', function () {
+        var container = document.getElementById('variacoes-container');
+        var totalForms = document.querySelector('[name="variacaoproduto_set-TOTAL_FORMS"]');
+        var currentCount = parseInt(totalForms.value);
+
+        var forms = container.querySelectorAll('.variacao-form');
+        var lastForm = forms[forms.length - 1];
+        var newForm = lastForm.cloneNode(true);
+
+        // Limpa os valores dos inputs e selects
+        newForm.querySelectorAll('input, select').forEach(function (input) {
+            if (input.type !== 'hidden') input.value = '';
+            if (input.type === 'checkbox') input.checked = false;
+        });
+
+        // Atualiza os índices dos campos
+        newForm.innerHTML = newForm.innerHTML.replace(
+            new RegExp('variacaoproduto_set-' + (currentCount - 1), 'g'),
+            'variacaoproduto_set-' + currentCount
+        );
+
+        container.appendChild(newForm);
+        totalForms.value = currentCount + 1;
+    });
+
+    // Bloquear apenas letras P, M, G, X e números 0-9 (em maiúsculo)
+    document.addEventListener('input', function (e) {
+        if (e.target.name && e.target.name.includes('tamanho')) {
+            let valor = e.target.value.toUpperCase().replace(/[^PMGX0-9]/g, '').slice(0, 3);
+            e.target.value = valor;
+        }
+    });
+</script>
+
 
 {% endblock %}

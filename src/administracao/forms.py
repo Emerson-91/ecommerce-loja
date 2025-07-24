@@ -1,16 +1,6 @@
 ﻿from django import forms
 from produtos.models import Produto, VariacaoProduto, ImagemProduto
-
-TAMANHO_CHOICES = [
-    ('NORMAL', 'Normal'),
-    ('PLUS', 'Plus'),
-    ('NUMERACAO', 'Numeração'),
-]
-
-# Exemplo de tamanhos baseados no tipo
-TAMANHOS_NORMAL = ['P', 'M', 'G', 'GG']
-TAMANHOS_PLUS = ['P', 'M', 'G', 'GG']
-TAMANHOS_NUMERACAO = ['36', '38', '40', '42', '44', '46']
+import re
 
 
 class ProdutoForm(forms.ModelForm):
@@ -41,47 +31,21 @@ class ProdutoForm(forms.ModelForm):
 
 
 class VariacaoProdutoForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        tamanhos_grade = kwargs.pop('tamanhos_grade', [])
-        super().__init__(*args, **kwargs)
-
-        # Tipo de tamanho
-        self.fields['tipo_tamanho'].widget = forms.Select(
-            choices=TAMANHO_CHOICES, attrs={'class': 'form-select w-full'}
-        )
-
-        tipo_tamanho = self.data.get('tipo_tamanho', 'NORMAL')
-        if tipo_tamanho == 'NORMAL':
-            tamanhos = TAMANHOS_NORMAL
-        elif tipo_tamanho == 'PLUS':
-            tamanhos = TAMANHOS_PLUS
-        elif tipo_tamanho == 'NUMERACAO':
-            tamanhos = TAMANHOS_NUMERACAO
-        else:
-            tamanhos = []
-
-        self.fields['tamanho'].widget = forms.Select(
-            choices=[('', '--- Selecione ---')] + [(t, t) for t in tamanhos],
-            attrs={'class': 'form-select w-full'}
-        )
-
-        self.fields['cor'].widget = forms.TextInput(
-            attrs={'class': 'form-input w-full'})
-        self.fields['estoque'].widget = forms.NumberInput(
-            attrs={'class': 'form-input w-full'})
-
     class Meta:
         model = VariacaoProduto
-        fields = ['cor', 'tipo_tamanho', 'tamanho', 'estoque']
+        fields = ['cor', 'tamanho', 'estoque']
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['cor'].widget.attrs.update({'class': 'form-input w-full'})
+        self.fields['tamanho'].widget.attrs.update(
+            {'class': 'form-input w-full'})
+        self.fields['estoque'].widget.attrs.update(
+            {'class': 'form-input w-full'})
 
-# Imagem FormSet
-ImagemFormSet = forms.modelformset_factory(
-    ImagemProduto,
-    fields=('imagem',),
-    extra=1,
-    can_delete=True,
-    widgets={
-        'imagem': forms.ClearableFileInput(attrs={'class': 'form-control'})
-    }
-)
+    def clean_tamanho(self):
+        tamanho = self.cleaned_data['tamanho'].strip().upper()
+        if not re.match(r'^[A-Z0-9]+$', tamanho):
+            raise forms.ValidationError(
+                "Digite apenas letras (A-Z) e números (0-9), sem espaços ou símbolos.")
+        return tamanho
