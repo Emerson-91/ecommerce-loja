@@ -1,5 +1,7 @@
 from django.db import models
 
+# Modelos de Categoria e Marca
+
 
 class Categoria(models.Model):
     nome = models.CharField(max_length=100)
@@ -15,22 +17,7 @@ class Marca(models.Model):
         return self.nome
 
 
-class GradeTamanho(models.Model):
-    TIPOS_GRADE = [
-        ('N', 'Normal'),
-        ('P', 'Plus'),
-        ('U', 'Numeração'),
-    ]
-    tipo = models.CharField(max_length=1, choices=TIPOS_GRADE, default='N')
-    tamanhos = models.CharField(
-        max_length=100,
-        help_text="Ex: P,M,G,GG ou 36,38,40"
-    )
-
-    def __str__(self):
-        return f"{self.get_tipo_display()} ({self.tamanhos})"
-
-
+# Modelos de Produto
 class Produto(models.Model):
     nome = models.CharField(max_length=200)
     codigo_interno = models.CharField(max_length=50, unique=True)
@@ -40,8 +27,6 @@ class Produto(models.Model):
         Categoria, on_delete=models.SET_NULL, null=True, blank=True)
     marca = models.ForeignKey(
         Marca, on_delete=models.SET_NULL, null=True, blank=True)
-    grade_tamanho = models.ForeignKey(
-        GradeTamanho, on_delete=models.SET_NULL, null=True, blank=True)
 
     imagem_principal = models.ImageField(
         upload_to='produtos/', null=True, blank=True)
@@ -71,17 +56,29 @@ class Produto(models.Model):
         return f"{self.nome} ({self.codigo_interno})"
 
 
+# Modelos de Variação do Produto
 class VariacaoProduto(models.Model):
+    TIPO_TAMANHO_CHOICES = [
+        ('NORMAL', 'Normal'),
+        ('PLUS', 'Plus'),
+        ('NUMERACAO', 'Numeração'),
+    ]
+
     produto = models.ForeignKey(
         Produto, on_delete=models.CASCADE, related_name='variacoes')
     cor = models.CharField(max_length=50, blank=True)
-    tamanho = models.CharField(max_length=10, blank=True)
+
+    tipo_tamanho = models.CharField(
+        max_length=15, choices=TIPO_TAMANHO_CHOICES, default='NORMAL')
+
+    tamanho = models.CharField(max_length=50, blank=True)  # Tamanho do produto
     estoque = models.PositiveIntegerField(default=0)
 
     def __str__(self):
-        return f"{self.produto.nome} - {self.cor} - {self.tamanho}"
+        return f"{self.produto.nome} - {self.cor} - {self.tipo_tamanho} - {self.tamanho}"
 
 
+# Imagens adicionais do produto
 class ImagemProduto(models.Model):
     produto = models.ForeignKey(
         Produto, on_delete=models.CASCADE, related_name='imagens')

@@ -11,7 +11,7 @@
 <form method="post" enctype="multipart/form-data" class="space-y-10">
     {% csrf_token %}
 
-    <!-- Campos principais -->
+    <!-- Dados do produto -->
     <section class="bg-white p-6 rounded-xl shadow border border-gray-200">
         <h2 class="text-xl font-semibold mb-6 text-gray-800">Dados do Produto</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -19,9 +19,6 @@
             <div class="space-y-1">
                 <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
                 {{ field|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" }}
-                {% if field.help_text %}
-                    <p class="text-xs text-gray-500">{{ field.help_text }}</p>
-                {% endif %}
                 {% if field.errors %}
                     {% for error in field.errors %}
                     <p class="text-sm text-red-600 mt-1">{{ error }}</p>
@@ -30,34 +27,88 @@
             </div>
             {% endfor %}
         </div>
-
-        <!-- Preview da imagem principal -->
-        <div class="mt-6">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Preview da Imagem Principal</label>
-            <img id="preview" src="{% if produto and produto.imagem_principal %}{{ produto.imagem_principal.url }}{% endif %}" alt="Preview imagem" class="max-h-40 rounded-md border border-gray-300 shadow-sm">
-        </div>
-
-        <!-- Grade -->
-        <div class="mt-6">
-            <label for="{{ form.grade_tamanho.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">Grade de Tamanho</label>
-            {{ form.grade_tamanho|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" }}
-            {% for error in form.grade_tamanho.errors %}
-                <p class="text-sm text-red-600 mt-1">{{ error }}</p>
-            {% endfor %}
-        </div>
-
-        <!-- Tipo de Grade -->
-        <div class="mt-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo de Grade Selecionado:</label>
-            <span id="tipo-grade" class="inline-block font-semibold text-indigo-600">
-                {% if produto and produto.grade_tamanho %}
-                    {{ produto.grade_tamanho.get_tipo_display }}
-                {% endif %}
-            </span>
-        </div>
     </section>
 
     <!-- Variações -->
+    <script>
+const tamanhosPorTipo = {
+    'NORMAL': ['P', 'M', 'G', 'GG'],
+    'PLUS': ['P', 'M', 'G', 'GG'],
+    'NUMERACAO': ['36', '38', '40', '42', '44', '46']
+};
+
+function atualizarTamanhos(selectTipo, selectTamanho) {
+    const tipo = selectTipo.value || 'NORMAL'; // Garante valor padrão
+    const tamanhos = tamanhosPorTipo[tipo] || [];
+    const valorOriginal = selectTamanho.dataset.value || '';
+    selectTamanho.innerHTML = '';
+    const optDefault = document.createElement('option');
+    optDefault.value = '';
+    optDefault.textContent = '--- Selecione ---';
+    selectTamanho.appendChild(optDefault);
+    tamanhos.forEach(function(t) {
+        const opt = document.createElement('option');
+        opt.value = t;
+        opt.textContent = t;
+        selectTamanho.appendChild(opt);
+    });
+    // Restaura o valor original se existir
+    if (valorOriginal) {
+        selectTamanho.value = valorOriginal;
+    }
+}
+
+// Para todos os forms já renderizados
+document.querySelectorAll('.variacao-form').forEach(function(form) {
+    const selectTipo = form.querySelector('select[name$="tipo_tamanho"]');
+    const selectTamanho = form.querySelector('select[name$="tamanho"]');
+    if (selectTipo && selectTamanho) {
+        selectTipo.addEventListener('change', function() {
+            atualizarTamanhos(selectTipo, selectTamanho);
+        });
+        // Atualiza ao carregar a página
+        atualizarTamanhos(selectTipo, selectTamanho);
+    }
+});
+
+// Para novos forms adicionados
+document.getElementById('add-variacao').addEventListener('click', function() {
+    var container = document.getElementById('variacoes-container');
+    var totalForms = document.querySelector('[name="variacaoproduto_set-TOTAL_FORMS"]');
+    var currentCount = parseInt(totalForms.value);
+
+    var forms = container.querySelectorAll('.variacao-form');
+    var lastForm = forms[forms.length - 1];
+    var newForm = lastForm.cloneNode(true);
+
+    // Limpa os valores dos inputs e selects
+    newForm.querySelectorAll('input, select').forEach(function(input) {
+        if (input.type !== 'hidden') input.value = '';
+        if (input.type === 'checkbox') input.checked = false;
+    });
+
+    // Atualiza os índices dos campos
+    newForm.innerHTML = newForm.innerHTML.replace(
+        new RegExp('variacaoproduto_set-' + (currentCount - 1), 'g'),
+        'variacaoproduto_set-' + currentCount
+    );
+
+    container.appendChild(newForm);
+    totalForms.value = currentCount + 1;
+
+    // Atualiza o select de tamanho do novo form
+    setTimeout(function() {
+        const selectTipo = newForm.querySelector('select[name$="tipo_tamanho"]');
+        const selectTamanho = newForm.querySelector('select[name$="tamanho"]');
+        if (selectTipo && selectTamanho) {
+            atualizarTamanhos(selectTipo, selectTamanho);
+            selectTipo.addEventListener('change', function() {
+                atualizarTamanhos(selectTipo, selectTamanho);
+            });
+        }
+    }, 50);
+});
+</script>
     <section class="bg-white p-6 rounded-xl shadow border border-gray-200">
         <h2 class="text-xl font-semibold mb-6 text-gray-800">Variações</h2>
 
@@ -66,27 +117,46 @@
         <div id="variacoes-container" class="space-y-4">
             {% for form in variacoes_formset %}
             <div class="variacao-form border border-gray-300 rounded-lg bg-gray-50 p-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                {% for field in form %}
                 <div class="space-y-1">
-                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
-                    {% if field.name == "tamanho" %}
-                        {{ field|add_class:"form-select w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" }}
-                    {% else %}
-                        {{ field|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" }}
-                    {% endif %}
-                    {% if field.errors %}
-                        {% for error in field.errors %}
+                    <label for="{{ form.tipo_tamanho.id_for_label }}" class="block text-sm font-medium text-gray-700">Tipo de Tamanho</label>
+                    {{ form.tipo_tamanho|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" }}
+                    {% if form.tipo_tamanho.errors %}
+                        {% for error in form.tipo_tamanho.errors %}
                         <p class="text-sm text-red-600 mt-1">{{ error }}</p>
                         {% endfor %}
                     {% endif %}
                 </div>
-                {% endfor %}
-                <div class="flex justify-center md:justify-start">
-                    {% if form.instance.pk or form.can_delete %}
-                    {{ form.DELETE }}
-                    <button type="button" class="text-red-600 hover:underline text-sm remove-variacao" aria-label="Remover variação">Remover</button>
+                <div class="space-y-1">
+                    <label for="{{ form.tamanho.id_for_label }}" class="block text-sm font-medium text-gray-700">Tamanho</label>
+                    <select name="{{ form.tamanho.html_name }}" id="{{ form.tamanho.id_for_label }}"
+    class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+    data-value="{{ form.tamanho.value }}">
+</select>
+                    {% if form.tamanho.errors %}
+                        {% for error in form.tamanho.errors %}
+                        <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                        {% endfor %}
                     {% endif %}
                 </div>
+                <div class="space-y-1">
+                    <label for="{{ form.cor.id_for_label }}" class="block text-sm font-medium text-gray-700">Cor</label>
+                    {{ form.cor|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" }}
+                    {% if form.cor.errors %}
+                        {% for error in form.cor.errors %}
+                        <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                <div class="space-y-1">
+                    <label for="{{ form.estoque.id_for_label }}" class="block text-sm font-medium text-gray-700">Estoque</label>
+                    {{ form.estoque|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" }}
+                    {% if form.estoque.errors %}
+                        {% for error in form.estoque.errors %}
+                        <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                {{ form.DELETE }} <!-- Para permitir exclusão de variação -->
             </div>
             {% endfor %}
         </div>
@@ -96,30 +166,7 @@
         </button>
     </section>
 
-    <!-- Imagens adicionais -->
-    <section class="bg-white p-6 rounded-xl shadow border border-gray-200">
-        <h2 class="text-xl font-semibold mb-6 text-gray-800">Imagens Adicionais</h2>
-
-        {{ imagens_formset.management_form }}
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {% for form in imagens_formset %}
-                {% for field in form %}
-                <div class="space-y-1">
-                    <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-700">{{ field.label }}</label>
-                    {{ field|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" }}
-                    {% if field.errors %}
-                        {% for error in field.errors %}
-                        <p class="text-sm text-red-600 mt-1">{{ error }}</p>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-                {% endfor %}
-            {% endfor %}
-        </div>
-    </section>
-
-    <!-- Botão salvar -->
+    <!-- Botão -->
     <div>
         <button type="submit" class="w-full md:w-auto px-8 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded shadow transition">
             Salvar Produto
@@ -127,137 +174,4 @@
     </div>
 </form>
 
-<style>
-    /* Esconder checkbox de DELETE, mas manter funcional */
-    .variacao-form input[type="checkbox"][name$="-DELETE"] {
-        display: none;
-    }
-</style>
-
-<script>
-function previewImagem(input) {
-    const preview = document.getElementById('preview');
-    const file = input.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            preview.src = e.target.result;
-            preview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-function preencherTamanhos(gradeId) {
-    fetch(`/administracao/ajax/carregar-grades/?tipo=all`)
-        .then(response => response.json())
-        .then(data => {
-            const grade = data.find(g => g.id == gradeId || g.id == parseInt(gradeId));
-            if (!grade) return;
-            const tamanhos = grade.tamanhos.split(',').map(t => t.trim());
-            const selects = document.querySelectorAll('select[name$="-tamanho"]');
-            selects.forEach(select => {
-                const valorAnterior = select.value;
-                select.innerHTML = '<option value="">--- Selecione ---</option>';
-                tamanhos.forEach(t => {
-                    const opt = document.createElement('option');
-                    opt.value = t;
-                    opt.text = t;
-                    select.appendChild(opt);
-                });
-                if (valorAnterior) select.value = valorAnterior;
-            });
-        });
-}
-
-function atualizarTipoGrade(gradeId) {
-    fetch(`/administracao/ajax/carregar-grades/?tipo=all`)
-        .then(response => response.json())
-        .then(data => {
-            const grade = data.find(g => g.id == parseInt(gradeId));
-            if (!grade) {
-                document.getElementById('tipo-grade').textContent = '';
-                return;
-            }
-            document.getElementById('tipo-grade').textContent = grade.tipo_display;
-        });
-}
-
-document.addEventListener('DOMContentLoaded', function () {
-    const gradeSelect = document.querySelector('select[name="grade_tamanho"]');
-    if (gradeSelect) {
-        gradeSelect.addEventListener('change', function () {
-            const gradeId = this.value;
-            if (gradeId) {
-                preencherTamanhos(gradeId);
-                atualizarTipoGrade(gradeId);
-            }
-        });
-
-        if (gradeSelect.value) {
-            preencherTamanhos(gradeSelect.value);
-            atualizarTipoGrade(gradeSelect.value);
-        }
-    }
-
-    const inputImagem = document.querySelector('input[name="imagem_principal"]');
-    if (inputImagem) {
-        inputImagem.addEventListener('change', function () {
-            previewImagem(this);
-        });
-    }
-
-    // Adicionar nova variação
-    const addBtn = document.getElementById('add-variacao');
-    if (addBtn) {
-        addBtn.addEventListener('click', function () {
-            const container = document.getElementById('variacoes-container');
-            const forms = container.querySelectorAll('.variacao-form');
-            const totalForms = document.querySelector('input[name="form-TOTAL_FORMS"]');
-            const formNum = forms.length;
-
-            if (forms.length === 0) return;
-
-            // Clona o último form
-            const lastForm = forms[forms.length - 1];
-            const newForm = lastForm.cloneNode(true);
-
-            // Limpa valores dos inputs e selects
-            newForm.querySelectorAll('input, select').forEach(input => {
-                if (input.type === 'checkbox') {
-                    input.checked = false;
-                } else {
-                    input.value = '';
-                }
-            });
-
-            // Atualiza os índices dos campos (form-0-, form-1- etc)
-            newForm.innerHTML = newForm.innerHTML.replace(/form-(\d+)-/g, `form-${formNum}-`);
-
-            // Esconde o checkbox de DELETE (deixe marcado como false)
-            const deleteInput = newForm.querySelector('input[type="checkbox"][name$="-DELETE"]');
-            if (deleteInput) {
-                deleteInput.checked = false;
-            }
-
-            container.appendChild(newForm);
-
-            // Atualiza total de forms
-            totalForms.value = formNum + 1;
-        });
-    }
-
-    // Remover variação
-    document.getElementById('variacoes-container').addEventListener('click', function (e) {
-        if (e.target.classList.contains('remove-variacao')) {
-            const form = e.target.closest('.variacao-form');
-            const deleteInput = form.querySelector('input[type="checkbox"][name$="-DELETE"]');
-            if (deleteInput) {
-                deleteInput.checked = true;
-                form.style.display = 'none';
-            }
-        }
-    });
-});
-</script>
 {% endblock %}
