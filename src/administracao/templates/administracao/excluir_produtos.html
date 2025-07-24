@@ -1,12 +1,21 @@
 ﻿{% extends 'administracao/base_admin.html' %}
 
 {% block content %}
-<h2>Confirmar Exclusão</h2>
-<p>Tem certeza que deseja desativar o produto <strong>{{ produto.nome }}</strong>?</p>
+<div class="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
+  <h2 class="text-xl font-semibold text-red-600 mb-4">Confirmar Exclusão</h2>
+  <p class="mb-6 text-gray-700">
+    Tem certeza que deseja desativar o produto <strong class="font-bold">{{ produto.nome }}</strong>?
+  </p>
 
-<form method="post">
+  <form method="post" class="flex justify-between">
     {% csrf_token %}
-    <button type="submit" class="btn btn-danger">Confirmar</button>
-    <a href="{% url 'administracao:lista_produtos' %}" class="btn btn-secondary">Cancelar</a>
-</form>
+    <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded transition">
+      Confirmar
+    </button>
+    <a href="{% url 'administracao:lista_produtos' %}" class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-semibold py-2 px-6 rounded transition">
+      Cancelar
+    </a>
+  </form>
+</div>
 {% endblock %}
+
