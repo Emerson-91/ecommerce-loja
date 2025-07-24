@@ -37,7 +37,12 @@ class VariacaoProdutoForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['cor'].widget.attrs.update({'class': 'form-input w-full'})
+        # Campo cor como input color com Tailwind
+        self.fields['cor'].widget = forms.TextInput(attrs={
+            'type': 'color',
+            'class': 'w-full h-10 p-0 border border-gray-300 rounded'
+        })
+
         self.fields['tamanho'].widget.attrs.update(
             {'class': 'form-input w-full'})
         self.fields['estoque'].widget.attrs.update(
@@ -47,5 +52,6 @@ class VariacaoProdutoForm(forms.ModelForm):
         tamanho = self.cleaned_data['tamanho'].strip().upper()
         if not re.match(r'^[A-Z0-9]+$', tamanho):
             raise forms.ValidationError(
-                "Digite apenas letras (A-Z) e números (0-9), sem espaços ou símbolos.")
+                "Digite apenas letras (A-Z) e números (0-9), sem espaços ou símbolos."
+            )
         return tamanho

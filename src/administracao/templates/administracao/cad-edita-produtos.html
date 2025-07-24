@@ -34,6 +34,13 @@
         <h2 class="text-xl font-semibold mb-6 text-gray-800">Variações</h2>
 
         {{ variacoes_formset.management_form }}
+        {% if variacoes_formset.non_form_errors %}
+            <div class="text-red-600 mb-4">
+                {% for error in variacoes_formset.non_form_errors %}
+                    <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
 
         <div id="variacoes-container" class="space-y-4">
             {% for form in variacoes_formset %}
@@ -65,7 +72,9 @@
                         {% endfor %}
                     {% endif %}
                 </div>
-                {{ form.DELETE }} <!-- Para permitir exclusão de variação -->
+                <div>
+                    {{ form.DELETE }} <!-- checkbox para deletar variação -->
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -84,7 +93,6 @@
 </form>
 
 <script>
-    // Adiciona uma nova variação
     document.getElementById('add-variacao').addEventListener('click', function () {
         var container = document.getElementById('variacoes-container');
         var totalForms = document.querySelector('[name="variacaoproduto_set-TOTAL_FORMS"]');
@@ -94,23 +102,30 @@
         var lastForm = forms[forms.length - 1];
         var newForm = lastForm.cloneNode(true);
 
-        // Limpa os valores dos inputs e selects
+        // Limpa valores e atualiza os nomes e ids para o novo índice
         newForm.querySelectorAll('input, select').forEach(function (input) {
             if (input.type !== 'hidden') input.value = '';
             if (input.type === 'checkbox') input.checked = false;
+
+            if (input.name) {
+                input.name = input.name.replace(/\-\d+(-|$)/, `-${currentCount}$1`);
+            }
+            if (input.id) {
+                input.id = input.id.replace(/\-\d+(-|$)/, `-${currentCount}$1`);
+            }
         });
 
-        // Atualiza os índices dos campos
-        newForm.innerHTML = newForm.innerHTML.replace(
-            new RegExp('variacaoproduto_set-' + (currentCount - 1), 'g'),
-            'variacaoproduto_set-' + currentCount
-        );
+        newForm.querySelectorAll('label').forEach(function(label) {
+            if (label.htmlFor) {
+                label.htmlFor = label.htmlFor.replace(/\-\d+(-|$)/, `-${currentCount}$1`);
+            }
+        });
 
         container.appendChild(newForm);
         totalForms.value = currentCount + 1;
     });
 
-    // Bloquear apenas letras P, M, G, X e números 0-9 (em maiúsculo)
+    // Bloquear apenas letras P, M, G, X e números 0-9 (em maiúsculo) no campo tamanho
     document.addEventListener('input', function (e) {
         if (e.target.name && e.target.name.includes('tamanho')) {
             let valor = e.target.value.toUpperCase().replace(/[^PMGX0-9]/g, '').slice(0, 3);
@@ -118,6 +133,5 @@
         }
     });
 </script>
-
 
 {% endblock %}

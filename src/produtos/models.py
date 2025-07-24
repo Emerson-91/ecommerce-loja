@@ -56,7 +56,7 @@ class Produto(models.Model):
 class VariacaoProduto(models.Model):
     produto = models.ForeignKey(
         Produto, on_delete=models.CASCADE, related_name='variacoes')
-    cor = models.CharField(max_length=50, blank=True)
+    cor = models.CharField(max_length=7, blank=True)
     tamanho = models.CharField(max_length=3, blank=True)  # Texto livre
     estoque = models.PositiveIntegerField(default=0)
 
