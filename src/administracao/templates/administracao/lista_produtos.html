@@ -13,6 +13,13 @@
     <input type="text" name="q" placeholder="Buscar por nome ou código" value="{{ busca }}"
         class="w-full md:w-1/2 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500">
 
+    <select name="status"
+        class="px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-500">
+        <option value="ativos" {% if status == 'ativos' %}selected{% endif %}>Somente Ativos</option>
+        <option value="inativos" {% if status == 'inativos' %}selected{% endif %}>Somente Inativos</option>
+        <option value="todos" {% if status == 'todos' %}selected{% endif %}>Todos</option>
+    </select>
+
     <div class="flex gap-2">
         <button type="submit"
             class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md font-medium">
@@ -24,6 +31,7 @@
         </a>
     </div>
 </form>
+
 <div class="mb-4 text-right">
   <span class="inline-block bg-indigo-100 text-indigo-800 text-sm font-semibold px-4 py-2 rounded-full">
     Total de itens em estoque: {{ total_estoque }}

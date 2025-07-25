@@ -1,0 +1,15 @@
+﻿.ribbon {
+    position: absolute;
+    top: 10px;
+    left: -30px;
+    background: #700808;
+    /* vermelho */
+    color: white;
+    padding: 5px 40px;
+    font-weight: bold;
+    font-size: 0.8rem;
+    text-align: center;
+    transform: rotate(-45deg);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+    z-index: 10;
+}

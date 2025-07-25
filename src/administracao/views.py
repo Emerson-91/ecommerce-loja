@@ -93,19 +93,26 @@ def editar_produto(request, produto_id):
 
 def lista_produtos(request):
     busca = request.GET.get('q', '')
+    status = request.GET.get('status', 'ativos')
 
     produtos = Produto.objects.all()
+
+    # Filtro por status
+    if status == 'ativos':
+        produtos = produtos.filter(ativo=True)
+    elif status == 'inativos':
+        produtos = produtos.filter(ativo=False)
+
     if busca:
         produtos = produtos.filter(nome__icontains=busca)
 
-    # Total de estoque somando todas as variações
+    # Total de estoque somando variações
     total_estoque = sum([
         sum([v.estoque for v in produto.variacoes.all()])
         for produto in produtos
     ])
 
-    # Paginação (se estiver usando)
-    from django.core.paginator import Paginator
+    # Paginação
     paginator = Paginator(produtos, 10)
     page = request.GET.get('page')
     produtos_paginados = paginator.get_page(page)
@@ -113,6 +120,7 @@ def lista_produtos(request):
     return render(request, 'administracao/lista_produtos.html', {
         'produtos': produtos_paginados,
         'busca': busca,
+        'status': status,
         'total_estoque': total_estoque,
     })
 

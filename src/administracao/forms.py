@@ -13,6 +13,9 @@ class ProdutoForm(forms.ModelForm):
             'imagem_principal', 'valor_venda', 'peso', 'altura', 'largura',
             'ncm', 'cest', 'cfop', 'desconto_maximo', 'ativo'
         ]
+        labels = {
+            'desconto_maximo': 'Desconto máximo permitido (%)',
+        }
         widgets = {
             'nome': forms.TextInput(attrs={'class': 'form-control'}),
             'codigo_interno': forms.TextInput(attrs={'class': 'form-control'}),

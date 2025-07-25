@@ -1,4 +1,6 @@
 ﻿{% extends 'base.html' %}
+{% load static %}
+
 {% block content %}
 
 <!-- Carrossel de Banner -->
@@ -18,7 +20,7 @@
         <p class="text-indigo-100 text-lg md:text-xl mb-6 max-w-xl drop-shadow">
           Estilos exclusivos para você arrasar em todas as ocasiões
         </p>
-        <a href="#" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition">
+        <a href="{% url 'core:masculino' %}" class="bg-indigo-500 hover:bg-indigo-600 text-white font-semibold py-3 px-8 rounded-full shadow-lg transition">
           Compre Agora
         </a>
       </div>
@@ -31,7 +33,7 @@
         <p class="mb-6 text-indigo-100 text-lg max-w-xl">
           Aproveite até <span class="font-black">50% de desconto</span> em toda a loja! Só essa semana.
         </p>
-        <a href="#" class="bg-white text-indigo-700 font-bold py-3 px-8 rounded-full shadow hover:bg-gray-100 transition">
+        <a href="{% url 'core:ofertas' %}" class="bg-white text-indigo-700 font-bold py-3 px-8 rounded-full shadow hover:bg-gray-100 transition">
           Ver Ofertas
         </a>
       </div>
@@ -53,27 +55,23 @@
   </div>
 </section>
 
-
 <!-- Categorias -->
 <section class="mb-16">
   <h2 class="text-3xl font-bold mb-8 text-center">Categorias Populares</h2>
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
-    <!-- Masculino -->
-    <a href="#" class="group relative rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition">
+    <a href="{% url 'core:masculino' %}" class="group relative rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition">
       <img src="https://images.unsplash.com/photo-1521334884684-d80222895322?auto=format&fit=crop&w=600&q=80" alt="Masculino" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
       <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
         <h3 class="text-white text-2xl font-semibold">Masculino</h3>
       </div>
     </a>
-    <!-- Feminino -->
-    <a href="#" class="group relative rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition">
+    <a href="{% url 'core:feminino' %}" class="group relative rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition">
       <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="Feminino" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
       <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
         <h3 class="text-white text-2xl font-semibold">Feminino</h3>
       </div>
     </a>
-    <!-- Acessórios -->
-    <a href="#" class="group relative rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition">
+    <a href="{% url 'core:acessorios' %}" class="group relative rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition">
       <img src="https://images.unsplash.com/photo-1512436991641-6745cdb1723f?auto=format&fit=crop&w=600&q=80" alt="Acessórios" class="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
       <div class="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
         <h3 class="text-white text-2xl font-semibold">Acessórios</h3>
@@ -86,17 +84,28 @@
 <section class="mb-16">
   <h2 class="text-3xl font-bold mb-8 text-center">Produtos em Destaque</h2>
   <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-8">
-    {% for i in "12345678" %}
-    <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
-      <img src="https://images.unsplash.com/photo-1521334884684-d80222895322?auto=format&fit=crop&w=400&q=80" alt="Produto {{ i }}" class="w-full h-48 object-cover" />
+    {% for produto in produtos %}
+    <a href="{% url 'core:produto_detalhe' produto.id %}" class="block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 no-underline">
+      {% if produto.imagem_principal %}
+        <img src="{{ produto.imagem_principal.url }}" alt="{{ produto.nome }}" class="w-full h-48 object-cover" />
+      {% else %}
+        <img src="{% static 'img/placeholder.png' %}" alt="Sem imagem" class="w-full h-48 object-cover" />
+      {% endif %}
       <div class="p-4">
-        <h3 class="font-semibold text-gray-900 mb-2 truncate">Produto Exemplo {{ i }}</h3>
-        <p class="text-indigo-600 font-bold text-lg">R$ 129,90</p>
-        <button class="mt-3 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition">
+        <h3 class="font-semibold text-gray-900 mb-2 truncate">{{ produto.nome }}</h3>
+        {% if produto.desconto_maximo and produto.desconto_maximo > 0 %}
+          <p class="text-gray-500 line-through">R$ {{ produto.valor_venda|floatformat:2 }}</p>
+          <p class="text-indigo-600 font-bold text-lg">R$ {{ produto.preco_com_desconto|floatformat:2 }}</p>
+        {% else %}
+          <p class="text-indigo-600 font-bold text-lg">R$ {{ produto.valor_venda|floatformat:2 }}</p>
+        {% endif %}
+        <button class="mt-3 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700 transition pointer-events-none">
           Adicionar ao Carrinho
         </button>
       </div>
-    </div>
+    </a>
+    {% empty %}
+      <p class="text-center text-gray-500 col-span-full">Nenhum produto disponível.</p>
     {% endfor %}
   </div>
 </section>

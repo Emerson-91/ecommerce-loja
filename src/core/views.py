@@ -4,7 +4,20 @@ from produtos.models import Produto, Categoria
 
 
 def home(request):
-    return render(request, 'core/home.html')
+    # Ou algum filtro para produtos em destaque
+    produtos = Produto.objects.filter(ativo=True)
+
+    for produto in produtos:
+        if produto.desconto_maximo and produto.desconto_maximo > 0:
+            produto.preco_com_desconto = produto.valor_venda * \
+                (1 - produto.desconto_maximo / 100)
+        else:
+            produto.preco_com_desconto = produto.valor_venda
+
+    context = {
+        'produtos': produtos,
+    }
+    return render(request, 'core/home.html', context)
 
 
 def sobre(request):
@@ -21,7 +34,14 @@ def politica_privacidade(request):
 
 
 def ofertas(request):
-    produtos = Produto.objects.filter(ativo=True).exclude(desconto_maximo=0)
+    produtos = Produto.objects.filter(
+        ativo=True,
+        desconto_maximo__gt=0
+    )
+    # Calcular preco_promocional e desconto para cada produto
+    for p in produtos:
+        p.preco_promocional = p.valor_venda * (1 - p.desconto_maximo / 100)
+        p.desconto = round(p.desconto_maximo)
     return render(request, 'core/ofertas.html', {'produtos': produtos})
 
 
@@ -33,34 +53,69 @@ def novidades(request):
 
 def masculino(request):
     produtos = Produto.objects.filter(
-        ativo=True, categoria__nome__iexact='Masculino')
+        ativo=True, categoria__nome__iexact='Masculino'
+    )
+    for p in produtos:
+        if p.desconto_maximo and p.desconto_maximo > 0:
+            p.preco_promocional = p.valor_venda * (1 - p.desconto_maximo / 100)
+            p.desconto = round(p.desconto_maximo)
+        else:
+            p.preco_promocional = None
+            p.desconto = 0
     return render(request, 'core/categorias/masculino.html', {'produtos': produtos})
 
 
 def feminino(request):
     produtos = Produto.objects.filter(
-        ativo=True, categoria__nome__iexact='Feminino')
+        ativo=True, categoria__nome__iexact='Feminino'
+    )
+    for p in produtos:
+        if p.desconto_maximo and p.desconto_maximo > 0:
+            p.preco_promocional = p.valor_venda * (1 - p.desconto_maximo / 100)
+            p.desconto = round(p.desconto_maximo)
+        else:
+            p.preco_promocional = None
+            p.desconto = 0
     return render(request, 'core/categorias/feminino.html', {'produtos': produtos})
 
 
 def acessorios(request):
     produtos = Produto.objects.filter(
-        ativo=True, categoria__nome__iexact='Acessorios')
+        ativo=True, categoria__nome__iexact='Acessorios'
+    )
+    for p in produtos:
+        if p.desconto_maximo and p.desconto_maximo > 0:
+            p.preco_promocional = p.valor_venda * (1 - p.desconto_maximo / 100)
+            p.desconto = round(p.desconto_maximo)
+        else:
+            p.preco_promocional = None
+            p.desconto = 0
     return render(request, 'core/categorias/acessorios.html', {'produtos': produtos})
 
 
 # -------------------detalhes produto-------------------
+
 def produto_detalhe(request, produto_id):
     produto = get_object_or_404(Produto, id=produto_id)
+
+    preco_promocional = None
+    desconto = None
+
+    if produto.desconto_maximo:
+        preco_promocional = produto.valor_venda * \
+            (1 - produto.desconto_maximo / 100)
+        desconto = int(produto.desconto_maximo)
 
     produtos_similares = Produto.objects.filter(
         categoria=produto.categoria,
         marca=produto.marca,
         ativo=True
-    ).exclude(id=produto.id)[:8]  # limitar a 8 itens
+    ).exclude(id=produto.id)[:8]
 
     context = {
         'produto': produto,
+        'preco_promocional': preco_promocional,
+        'desconto': desconto,
         'produtos_similares': produtos_similares,
     }
     return render(request, 'core/produto_detalhe.html', context)

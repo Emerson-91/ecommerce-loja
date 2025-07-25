@@ -37,13 +37,22 @@
         <p class="text-sm text-gray-600">Categoria: {{ produto.categoria.nome }}</p>
         {% endif %}
 
-        <!-- Preço -->
-        <div class="mt-4">
-          {% if produto.preco_promocional and produto.preco_promocional < produto.valor_venda %}
-            <p class="text-2xl font-extrabold text-red-600">R$ {{ produto.preco_promocional|floatformat:2 }}</p>
-            <p class="line-through text-gray-400">R$ {{ produto.valor_venda|floatformat:2 }}</p>
+        <!-- Preço com destaque promocional -->
+        <div class="mt-4 space-y-1">
+          {% if preco_promocional and preco_promocional < produto.valor_venda %}
+            <p class="text-sm font-semibold text-green-700">
+              {{ desconto }}% OFF
+            </p>
+            <p class="text-3xl font-bold text-red-600">
+              R$ {{ preco_promocional|floatformat:2 }}
+            </p>
+            <p class="text-base text-gray-400 line-through">
+              R$ {{ produto.valor_venda|floatformat:2 }}
+            </p>
           {% else %}
-            <p class="text-2xl font-extrabold text-gray-900">R$ {{ produto.valor_venda|floatformat:2 }}</p>
+            <p class="text-3xl font-bold text-gray-900">
+              R$ {{ produto.valor_venda|floatformat:2 }}
+            </p>
           {% endif %}
         </div>
 
