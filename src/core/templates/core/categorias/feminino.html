@@ -1,0 +1,27 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Feminino{% endblock %}
+
+{% block content %}
+<section class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-6 text-gray-800">Moda Feminina</h1>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {% for produto in produtos %}
+        <a href="{% url 'core:produto_detalhe' produto.id %}" class="block border border-gray-200 rounded-lg shadow p-4 bg-white hover:shadow-lg transition">
+            {% if produto.imagem_principal %}
+                <img src="{{ produto.imagem_principal.url }}" alt="{{ produto.nome }}" class="w-full h-48 object-cover rounded">
+            {% else %}
+                <img src="{% static 'img/placeholder.png' %}" alt="Sem imagem" class="w-full h-48 object-cover rounded">
+            {% endif %}
+            <h2 class="text-lg font-semibold mt-2">{{ produto.nome }}</h2>
+            <p class="text-gray-600 text-sm">R$ {{ produto.valor_venda|floatformat:2 }}</p>
+        </a>
+        {% empty %}
+        <p class="text-gray-500 col-span-full">Nenhum produto disponível.</p>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}
+

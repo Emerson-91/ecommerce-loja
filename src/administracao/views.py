@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.forms import inlineformset_factory
 from django.db.models import Q
 
-from .forms import ProdutoForm, VariacaoProdutoForm
+from .forms import ProdutoForm, VariacaoProdutoForm, BaseVariacaoProdutoFormSet
 from produtos.models import Produto, VariacaoProduto
 
 
@@ -19,13 +19,13 @@ def cadastro_produto(request):
 
     if request.method == 'POST':
         form = ProdutoForm(request.POST, request.FILES)
-        # Passa None para instance porque produto ainda não existe
-        variacoes_formset = VariacaoFormSet(request.POST, instance=None)
+        variacoes_formset = VariacaoFormSet(
+            request.POST, request.FILES, instance=None)
 
         if form.is_valid():
             produto = form.save()
-            # Agora que produto existe, criamos o formset com a instância certa
-            variacoes_formset = VariacaoFormSet(request.POST, instance=produto)
+            variacoes_formset = VariacaoFormSet(
+                request.POST, request.FILES, instance=produto)
             if variacoes_formset.is_valid():
                 variacoes_formset.save()
                 messages.success(
@@ -35,7 +35,6 @@ def cadastro_produto(request):
                 messages.error(request, "Erro nas variações:")
         else:
             messages.error(request, "Erro no produto:")
-
         # Se chegou aqui, ou form ou formset inválidos.
         # Garantimos que o formset tem dados para renderizar os erros
         if not form.is_valid():
@@ -59,12 +58,13 @@ def cadastro_produto(request):
 def editar_produto(request, produto_id):
     produto = get_object_or_404(Produto, id=produto_id)
     VariacaoFormSet = inlineformset_factory(
-        Produto, VariacaoProduto, form=VariacaoProdutoForm, extra=1, can_delete=True
+        Produto, VariacaoProduto, form=VariacaoProdutoForm, formset=BaseVariacaoProdutoFormSet, extra=0, can_delete=True
     )
 
     if request.method == 'POST':
         form = ProdutoForm(request.POST, request.FILES, instance=produto)
-        variacoes_formset = VariacaoFormSet(request.POST, instance=produto)
+        variacoes_formset = VariacaoFormSet(
+            request.POST, request.FILES, instance=produto)
 
         if form.is_valid() and variacoes_formset.is_valid():
             form.save()
@@ -74,8 +74,12 @@ def editar_produto(request, produto_id):
             return redirect('administracao:lista_produtos')
         else:
             messages.error(request, "Erro ao editar produto ou variações.")
-            # mantém form e formset com erros para exibir no template
-
+            # Retorna o formulário com erros para o usuário
+            return render(request, 'administracao/cad-edita-produtos.html', {
+                'form': form,
+                'produto': produto,
+                'variacoes_formset': variacoes_formset,
+            })
     else:
         form = ProdutoForm(instance=produto)
         variacoes_formset = VariacaoFormSet(instance=produto)
@@ -89,20 +93,27 @@ def editar_produto(request, produto_id):
 
 def lista_produtos(request):
     busca = request.GET.get('q', '')
-    lista = Produto.objects.all()
 
+    produtos = Produto.objects.all()
     if busca:
-        lista = lista.filter(
-            Q(nome__icontains=busca) | Q(codigo_interno__icontains=busca)
-        )
+        produtos = produtos.filter(nome__icontains=busca)
 
-    paginator = Paginator(lista, 10)
-    pagina = request.GET.get('page')
-    produtos = paginator.get_page(pagina)
+    # Total de estoque somando todas as variações
+    total_estoque = sum([
+        sum([v.estoque for v in produto.variacoes.all()])
+        for produto in produtos
+    ])
+
+    # Paginação (se estiver usando)
+    from django.core.paginator import Paginator
+    paginator = Paginator(produtos, 10)
+    page = request.GET.get('page')
+    produtos_paginados = paginator.get_page(page)
 
     return render(request, 'administracao/lista_produtos.html', {
-        'produtos': produtos,
-        'busca': busca
+        'produtos': produtos_paginados,
+        'busca': busca,
+        'total_estoque': total_estoque,
     })
 
 

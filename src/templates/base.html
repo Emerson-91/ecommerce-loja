@@ -27,11 +27,11 @@
 
       <!-- Menu principal: só md+ -->
       <div class="hidden md:flex space-x-8 font-medium text-gray-700">
-        <a href="#" class="hover:text-indigo-600 transition">Masculino</a>
-        <a href="#" class="hover:text-indigo-600 transition">Feminino</a>
-        <a href="#" class="hover:text-indigo-600 transition">Acessórios</a>
-        <a href="#" class="hover:text-indigo-600 transition">Novidades</a>
-        <a href="#" class="hover:text-indigo-600 transition">Ofertas</a>
+        <a href="{% url 'core:masculino' %}" class="hover:text-indigo-600 transition">Masculino</a>
+        <a href="{% url 'core:feminino' %}" class="hover:text-indigo-600 transition">Feminino</a>
+        <a href="{% url 'core:acessorios' %}" class="hover:text-indigo-600 transition">Acessórios</a>
+        <a href="{% url 'core:novidades' %}" class="hover:text-indigo-600 transition">Novidades</a>
+        <a href="{% url 'core:ofertas' %}" class="hover:text-indigo-600 transition">Ofertas</a>
       </div>
 
       <!-- Menu direito: ícones todos juntos, visíveis sempre -->

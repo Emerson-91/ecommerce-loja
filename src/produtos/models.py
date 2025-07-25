@@ -59,6 +59,9 @@ class VariacaoProduto(models.Model):
     cor = models.CharField(max_length=7, blank=True)
     tamanho = models.CharField(max_length=3, blank=True)  # Texto livre
     estoque = models.PositiveIntegerField(default=0)
+    # ADICIONAR IMAGEM PARA VARIAÇÃO
+    imagem_cor = models.ImageField(
+        upload_to='produtos/variacoes/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.produto.nome} - {self.cor} - {self.tamanho}"

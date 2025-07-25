@@ -1,0 +1,209 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ produto.nome }} - Detalhes{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-8">
+  <div class="flex flex-col md:flex-row gap-8">
+
+    <!-- Imagens do produto -->
+    <div class="md:w-1/2">
+      <!-- Imagem principal -->
+      {% if produto.imagem_principal %}
+        <img id="main-img" src="{{ produto.imagem_principal.url }}" alt="{{ produto.nome }}" class="w-full rounded-lg shadow-lg object-contain max-h-[500px]">
+      {% else %}
+        <img id="main-img" src="{% static 'img/placeholder.png' %}" alt="Sem imagem" class="w-full rounded-lg shadow-lg object-contain max-h-[500px]">
+      {% endif %}
+
+      <!-- Miniaturas -->
+      <div class="flex gap-3 mt-4 overflow-x-auto">
+        {% for img in produto.imagens.all %}
+          <img src="{{ img.imagem.url }}" alt="{{ produto.nome }}" class="w-20 h-20 object-cover rounded cursor-pointer border-2 border-gray-200 hover:border-indigo-600" onclick="document.getElementById('main-img').src='{{ img.imagem.url }}'">
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Detalhes do produto -->
+    <div class="md:w-1/2 flex flex-col justify-between">
+      <div>
+        <h1 class="text-3xl font-bold text-gray-900">{{ produto.nome }}</h1>
+
+        {% if produto.marca %}
+        <p class="text-sm text-gray-600 mt-1">Marca: {{ produto.marca.nome }}</p>
+        {% endif %}
+
+        {% if produto.categoria %}
+        <p class="text-sm text-gray-600">Categoria: {{ produto.categoria.nome }}</p>
+        {% endif %}
+
+        <!-- Preço -->
+        <div class="mt-4">
+          {% if produto.preco_promocional and produto.preco_promocional < produto.valor_venda %}
+            <p class="text-2xl font-extrabold text-red-600">R$ {{ produto.preco_promocional|floatformat:2 }}</p>
+            <p class="line-through text-gray-400">R$ {{ produto.valor_venda|floatformat:2 }}</p>
+          {% else %}
+            <p class="text-2xl font-extrabold text-gray-900">R$ {{ produto.valor_venda|floatformat:2 }}</p>
+          {% endif %}
+        </div>
+
+        <!-- Descrição -->
+        <div class="mt-6 text-gray-700 whitespace-pre-line">
+          {{ produto.descricao|default:"Sem descrição disponível." }}
+        </div>
+
+        <!-- Variações -->
+        {% if produto.variacoes.exists %}
+        <form method="post" action="" class="mt-6">
+          {% csrf_token %}
+
+          <!-- Cores -->
+          <div>
+            <label class="block text-gray-700 font-semibold mb-2">Cor:</label>
+            <div class="flex space-x-3">
+              {% regroup produto.variacoes.all by cor as cores_grup %}
+              {% for cor in cores_grup %}
+                {% with cor_variacao=cor.list.0 %}
+                  <button
+                    type="button"
+                    class="cor-btn w-8 h-8 rounded-full border-2 border-gray-300 hover:border-indigo-600 focus:outline-none"
+                    style="background-color: {{ cor.grouper }};"
+                    data-cor="{{ cor.grouper }}"
+                    aria-label="Selecionar cor {{ cor.grouper }}"
+                  ></button>
+                {% endwith %}
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Tamanhos -->
+          <div class="mt-4">
+            <label class="block text-gray-700 font-semibold mb-2">Tamanho:</label>
+            <div id="tamanhos-container" class="flex flex-wrap gap-2">
+              {% for var in produto.variacoes.all %}
+                <button
+                  type="button"
+                  class="tamanho-btn px-3 py-1 border border-gray-300 rounded hover:border-indigo-600 focus:outline-none disabled:opacity-50"
+                  data-cor="{{ var.cor }}"
+                  data-tamanho="{{ var.tamanho }}"
+                  data-disponivel="{{ var.estoque|yesno:'true,false' }}"
+                  {% if not var.estoque %} disabled {% endif %}
+                >
+                  {{ var.tamanho }}
+                </button>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Inputs hidden para cor e tamanho -->
+          <input type="hidden" name="cor" id="input-cor" required>
+          <input type="hidden" name="tamanho" id="input-tamanho" required>
+
+          <div class="mt-6">
+            <button type="submit"
+                    class="w-full bg-indigo-600 text-white py-3 rounded font-semibold hover:bg-indigo-700 transition disabled:opacity-50"
+                    id="btn-add-carrinho"
+                    disabled>
+              Adicionar ao Carrinho
+            </button>
+          </div>
+        </form>
+        {% else %}
+          <p class="mt-6 text-red-600 font-semibold">Produto sem variações cadastradas.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Produtos Similares -->
+  {% if produtos_similares %}
+  <section class="mt-12">
+    <h2 class="text-2xl font-semibold mb-6 text-gray-800">Produtos Similares</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {% for p in produtos_similares %}
+      <a href="{% url 'core:produto_detalhe' p.id %}" class="block border border-gray-200 rounded shadow hover:shadow-lg transition bg-white p-3">
+        {% if p.imagem_principal %}
+          <img src="{{ p.imagem_principal.url }}" alt="{{ p.nome }}" class="w-full h-32 object-cover rounded mb-2">
+        {% else %}
+          <img src="{% static 'img/placeholder.png' %}" alt="Sem imagem" class="w-full h-32 object-cover rounded mb-2">
+        {% endif %}
+        <h3 class="text-sm font-semibold text-gray-900">{{ p.nome }}</h3>
+        <p class="text-sm text-gray-600">R$ {{ p.valor_venda|floatformat:2 }}</p>
+      </a>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+</div>
+
+<script>
+  // Variáveis globais
+  const coresBtns = document.querySelectorAll('.cor-btn');
+  const tamanhosBtns = document.querySelectorAll('.tamanho-btn');
+  const inputCor = document.getElementById('input-cor');
+  const inputTamanho = document.getElementById('input-tamanho');
+  const btnAddCarrinho = document.getElementById('btn-add-carrinho');
+
+  let corSelecionada = null;
+  let tamanhoSelecionado = null;
+
+  function atualizarTamanhos() {
+    tamanhosBtns.forEach(btn => {
+      const cor = btn.dataset.cor;
+      if(cor === corSelecionada && btn.dataset.disponivel === 'true') {
+        btn.disabled = false;
+        btn.classList.remove('opacity-50');
+      } else {
+        btn.disabled = true;
+        btn.classList.add('opacity-50');
+        if(btn.classList.contains('selected')) {
+          btn.classList.remove('selected');
+          tamanhoSelecionado = null;
+          inputTamanho.value = '';
+        }
+      }
+    });
+  }
+
+  function verificarBotaoEnviar() {
+    btnAddCarrinho.disabled = !(corSelecionada && tamanhoSelecionado);
+  }
+
+  // Seleção da cor
+  coresBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      // Remove seleção anterior
+      coresBtns.forEach(b => b.classList.remove('ring-4', 'ring-indigo-500'));
+      btn.classList.add('ring-4', 'ring-indigo-500');
+
+      corSelecionada = btn.dataset.cor;
+      inputCor.value = corSelecionada;
+
+      // Atualiza tamanhos disponíveis
+      atualizarTamanhos();
+
+      // Reset seleção tamanho
+      tamanhoSelecionado = null;
+      inputTamanho.value = '';
+
+      verificarBotaoEnviar();
+    });
+  });
+
+  // Seleção do tamanho
+  tamanhosBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+
+      // Remove seleção anterior
+      tamanhosBtns.forEach(b => b.classList.remove('bg-indigo-600', 'text-white'));
+      btn.classList.add('bg-indigo-600', 'text-white');
+
+      tamanhoSelecionado = btn.dataset.tamanho;
+      inputTamanho.value = tamanhoSelecionado;
+
+      verificarBotaoEnviar();
+    });
+  });
+</script>
+{% endblock %}

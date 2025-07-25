@@ -44,38 +44,52 @@
 
         <div id="variacoes-container" class="space-y-4">
             {% for form in variacoes_formset %}
-            <div class="variacao-form border border-gray-300 rounded-lg bg-gray-50 p-4 grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-                <div class="space-y-1">
-                    <label for="{{ form.tamanho.id_for_label }}" class="block text-sm font-medium text-gray-700">Tamanho</label>
-                    {{ form.tamanho|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" }}
-                    {% if form.tamanho.errors %}
+                <div class="variacao-form relative border border-gray-300 rounded-lg bg-gray-50 p-4 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
+                    {{ form.id }}
+
+                    <input type="hidden" name="{{ form.DELETE.name }}" id="{{ form.DELETE.id_for_label }}" class="delete-field" {% if form.DELETE.value %}checked{% endif %}>
+
+                    <!-- Tamanho -->
+                    <div class="space-y-1">
+                        <label for="{{ form.tamanho.id_for_label }}" class="block text-sm font-medium text-gray-700">Tamanho</label>
+                        {{ form.tamanho|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" }}
                         {% for error in form.tamanho.errors %}
-                        <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                            <p class="text-sm text-red-600 mt-1">{{ error }}</p>
                         {% endfor %}
-                    {% endif %}
-                </div>
-                <div class="space-y-1">
-                    <label for="{{ form.cor.id_for_label }}" class="block text-sm font-medium text-gray-700">Cor</label>
-                    {{ form.cor|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" }}
-                    {% if form.cor.errors %}
+                    </div>
+                    <!-- Cor -->
+                    <div class="space-y-1">
+                        <label for="{{ form.cor.id_for_label }}" class="block text-sm font-medium text-gray-700">Cor</label>
+                        {{ form.cor }}  {# já vem com type=color e classe definida #}
                         {% for error in form.cor.errors %}
-                        <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                            <p class="text-sm text-red-600 mt-1">{{ error }}</p>
                         {% endfor %}
-                    {% endif %}
-                </div>
-                <div class="space-y-1">
-                    <label for="{{ form.estoque.id_for_label }}" class="block text-sm font-medium text-gray-700">Estoque</label>
-                    {{ form.estoque|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" }}
-                    {% if form.estoque.errors %}
+                    </div>
+
+                    <!-- Estoque -->
+                    <div class="space-y-1">
+                        <label for="{{ form.estoque.id_for_label }}" class="block text-sm font-medium text-gray-700">Estoque</label>
+                        {{ form.estoque|add_class:"w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" }}
                         {% for error in form.estoque.errors %}
-                        <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                            <p class="text-sm text-red-600 mt-1">{{ error }}</p>
                         {% endfor %}
-                    {% endif %}
+                    </div>
+
+                    <!-- Imagem da cor -->
+                    <div class="space-y-1">
+                        <label for="{{ form.imagem_cor.id_for_label }}" class="block text-sm font-medium text-gray-700">Imagem da Cor</label>
+                        {{ form.imagem_cor|add_class:"w-full" }}
+                        {% if form.imagem_cor.value %}
+                            <img src="{{ form.imagem_cor.value.url }}" alt="Imagem da Cor" class="mt-2 w-20 h-20 object-cover rounded border border-gray-300 shadow-sm">
+                        {% endif %}
+                        {% for error in form.imagem_cor.errors %}
+                            <p class="text-sm text-red-600 mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Botão de remover -->
+                    <button type="button" class="absolute top-2 right-2 remove-variacao text-red-600 text-sm">🗑️</button>
                 </div>
-                <div>
-                    {{ form.DELETE }} <!-- checkbox para deletar variação -->
-                </div>
-            </div>
             {% endfor %}
         </div>
 
@@ -93,45 +107,66 @@
 </form>
 
 <script>
+document.addEventListener('DOMContentLoaded', function () {
+    const container = document.getElementById('variacoes-container');
+    const totalForms = document.querySelector('[name$="-TOTAL_FORMS"]');
+
+    function updateAttributes(element, index) {
+        if (element.name) element.name = element.name.replace(/-\d+-/, `-${index}-`);
+        if (element.id) element.id = element.id.replace(/-\d+-/, `-${index}-`);
+        if (element.htmlFor) element.htmlFor = element.htmlFor.replace(/-\d+-/, `-${index}-`);
+    }
+
     document.getElementById('add-variacao').addEventListener('click', function () {
-        var container = document.getElementById('variacoes-container');
-        var totalForms = document.querySelector('[name="variacaoproduto_set-TOTAL_FORMS"]');
-        var currentCount = parseInt(totalForms.value);
+        const forms = container.querySelectorAll('.variacao-form');
+        const lastForm = forms[forms.length - 1];
+        const newForm = lastForm.cloneNode(true);
 
-        var forms = container.querySelectorAll('.variacao-form');
-        var lastForm = forms[forms.length - 1];
-        var newForm = lastForm.cloneNode(true);
+        // Remove campo id (oculto) do form clonado, pois ele só existe em registros salvos
+        const idInput = newForm.querySelector('input[name$="-id"]');
+        if (idInput) idInput.remove();
+        const index = parseInt(totalForms.value);
 
-        // Limpa valores e atualiza os nomes e ids para o novo índice
-        newForm.querySelectorAll('input, select').forEach(function (input) {
-            if (input.type !== 'hidden') input.value = '';
-            if (input.type === 'checkbox') input.checked = false;
-
-            if (input.name) {
-                input.name = input.name.replace(/\-\d+(-|$)/, `-${currentCount}$1`);
-            }
-            if (input.id) {
-                input.id = input.id.replace(/\-\d+(-|$)/, `-${currentCount}$1`);
-            }
+        // Atualiza atributos e limpa valores
+        newForm.querySelectorAll('input, select, label').forEach(el => updateAttributes(el, index));
+        newForm.querySelectorAll('input:not([type="hidden"]), select').forEach(el => {
+            el.value = '';
+            if (el.type === 'checkbox') el.checked = false;
         });
 
-        newForm.querySelectorAll('label').forEach(function(label) {
-            if (label.htmlFor) {
-                label.htmlFor = label.htmlFor.replace(/\-\d+(-|$)/, `-${currentCount}$1`);
-            }
-        });
+        // Garante que DELETE esteja desmarcado
+        const deleteInput = newForm.querySelector('input.delete-field');
+        if (deleteInput) deleteInput.checked = false;
 
         container.appendChild(newForm);
-        totalForms.value = currentCount + 1;
+        totalForms.value = index + 1;
+
+        attachRemoveHandlers();
     });
 
-    // Bloquear apenas letras P, M, G, X e números 0-9 (em maiúsculo) no campo tamanho
+    function attachRemoveHandlers() {
+        document.querySelectorAll('.remove-variacao').forEach(button => {
+            button.onclick = function () {
+                const form = button.closest('.variacao-form');
+                const deleteInput = form.querySelector('input.delete-field');
+                if (deleteInput) {
+                    deleteInput.checked = true;
+                    form.style.display = 'none';
+                }
+            };
+        });
+    }
+
+    attachRemoveHandlers();
+
+    // Validação automática do campo "tamanho": permite apenas P, M, G, X, 0-9 (em maiúsculo)
     document.addEventListener('input', function (e) {
         if (e.target.name && e.target.name.includes('tamanho')) {
             let valor = e.target.value.toUpperCase().replace(/[^PMGX0-9]/g, '').slice(0, 3);
             e.target.value = valor;
         }
     });
+});
 </script>
 
 {% endblock %}

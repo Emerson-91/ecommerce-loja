@@ -1,4 +1,6 @@
 ﻿from django import forms
+from django.forms import BaseInlineFormSet
+from django.core.exceptions import ValidationError
 from produtos.models import Produto, VariacaoProduto, ImagemProduto
 import re
 
@@ -33,7 +35,7 @@ class ProdutoForm(forms.ModelForm):
 class VariacaoProdutoForm(forms.ModelForm):
     class Meta:
         model = VariacaoProduto
-        fields = ['cor', 'tamanho', 'estoque']
+        fields = ['cor', 'tamanho', 'estoque', 'imagem_cor']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -47,6 +49,8 @@ class VariacaoProdutoForm(forms.ModelForm):
             {'class': 'form-input w-full'})
         self.fields['estoque'].widget.attrs.update(
             {'class': 'form-input w-full'})
+        self.fields['imagem_cor'].widget.attrs.update(
+            {'class': 'form-control'})  # input file padrão
 
     def clean_tamanho(self):
         tamanho = self.cleaned_data['tamanho'].strip().upper()
@@ -55,3 +59,29 @@ class VariacaoProdutoForm(forms.ModelForm):
                 "Digite apenas letras (A-Z) e números (0-9), sem espaços ou símbolos."
             )
         return tamanho
+
+
+class BaseVariacaoProdutoFormSet(BaseInlineFormSet):
+    def clean(self):
+        super().clean()
+
+        combinacoes_usadas = set()
+
+        for form in self.forms:
+            # Ignora validação se o form for vazio (não preenchido) ou marcado para exclusão
+            if not hasattr(form, 'cleaned_data'):
+                continue
+
+            if self.can_delete and form.cleaned_data.get('DELETE'):
+                continue
+
+            tamanho = form.cleaned_data.get('tamanho')
+            cor = form.cleaned_data.get('cor')
+
+            if tamanho and cor:
+                chave = f"{tamanho.upper()}|{cor.lower()}"
+                if chave in combinacoes_usadas:
+                    raise ValidationError(
+                        f"A combinação Tamanho '{tamanho}' e Cor '{cor}' está duplicada."
+                    )
+                combinacoes_usadas.add(chave)

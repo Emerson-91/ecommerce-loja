@@ -29,6 +29,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '192.168.1.14',  # IP do servidor local
     '127.0.0.1',
+    '172.16.194.47',
     'localhost',  # Permite acesso local
 ]
 
@@ -51,8 +52,8 @@ INSTALLED_APPS = [
     'administracao',
     'carrinho',
     'tagplus',
-    
-    
+
+
     'tailwind',
     'theme',
     'django_extensions',

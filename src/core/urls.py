@@ -8,5 +8,17 @@ urlpatterns = [
     path('', views.home, name='home'),
     path('sobre/', views.sobre, name='sobre'),
     path('contato/', views.contato, name='contato'),
-    path('politica-privacidade/', views.politica_privacidade, name='politica_privacidade'),
+    path('politica-privacidade/', views.politica_privacidade,
+         name='politica_privacidade'),
+    path('ofertas/', views.ofertas, name='ofertas'),
+    path('novidades/', views.novidades, name='novidades'),
+    # CATEGORIAS
+    path('masculino/', views.masculino, name='masculino'),
+    path('feminino/', views.feminino, name='feminino'),
+    path('acessorios/', views.acessorios, name='acessorios'),
+
+    # detalhe do produto
+    path('produto/<int:produto_id>/',
+         views.produto_detalhe, name='produto_detalhe'),
+
 ]
