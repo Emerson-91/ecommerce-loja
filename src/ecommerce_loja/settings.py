@@ -145,7 +145,7 @@ STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     # Isso aponta para a pasta 'static' na raiz do projeto
-    os.path.join(BASE_DIR.parent, 'static'),
+    os.path.join(BASE_DIR, '/theme/static'),
 ]
 
 # Onde o Django DEVE COLETAR arquivos estáticos para PRODUÇÃO
