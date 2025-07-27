@@ -43,6 +43,10 @@ def contato(request):
     return render(request, 'core/contato.html')
 
 
+def faq(request):
+    return render(request, 'core/faq.html')
+
+
 def politica_privacidade(request):
     return render(request, 'core/politica_privacidade.html')
 

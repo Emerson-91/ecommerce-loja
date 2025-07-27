@@ -60,7 +60,9 @@
     </nav>
   </div>
 </header>
-
+    {% block breadcrumb %}
+    <!-- Breadcrumb vazio por padrão -->
+    {% endblock %}
 <!-- CONTEÚDO PRINCIPAL -->
 <main class="min-h-[80vh] container mx-auto px-6 py-8 relative z-0">
   {% block content %}{% endblock %}

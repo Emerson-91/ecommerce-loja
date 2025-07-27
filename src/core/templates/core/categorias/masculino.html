@@ -3,6 +3,18 @@
 
 {% block title %}Masculino{% endblock %}
 
+{% block breadcrumb %}
+    <nav class="text-sm text-gray-600 mb-6" aria-label="Breadcrumb">
+        <ol class="flex flex-wrap items-center space-x-3">
+            <li class="flex items-center">
+            <a href="{% url 'core:home' %}" class="text-indigo-600 font-medium">Home</a>
+            <li class="text-gray-400 font-bold">›</li>
+            </li>
+            <li class="text-gray-700 font-semibold">Masculino</li>
+        </ol>
+    </nav>
+{% endblock %}
+
 {% block content %}
 <section class="max-w-7xl mx-auto px-4 py-8">
     <h1 class="text-3xl font-bold mb-6 text-gray-800">Moda Masculina</h1>

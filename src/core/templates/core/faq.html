@@ -1,1 +1,68 @@
-﻿
+﻿{% extends 'base.html' %}
+{% block title %}Dúvidas Frequentes - FAQ{% endblock %}
+
+{% block content %}
+<section class="max-w-4xl mx-auto px-6 py-12">
+  <h1 class="text-4xl font-bold mb-10 text-center text-gray-800">Dúvidas Frequentes</h1>
+
+  <div class="space-y-10">
+
+    <!-- Pagamento -->
+    <div class="space-y-2">
+      <h2 class="text-xl font-semibold text-indigo-700 flex items-start">💳&nbsp; Quais as formas de pagamento?</h2>
+      <p class="text-gray-700 leading-relaxed">
+        Na loja física aceitamos <strong>dinheiro</strong>, <strong>cartões</strong> e <strong>pix</strong>.
+        No site, aceitamos <strong>cartões</strong> e <strong>pix</strong>.
+      </p>
+      <div class="text-sm bg-red-100 text-red-700 px-4 py-2 rounded border-l-4 border-red-500">
+        ⚠️ <strong>Atenção:</strong> Não trabalhamos com boleto bancário.
+      </div>
+    </div>
+
+    <!-- Atacado -->
+    <div class="space-y-2">
+      <h2 class="text-xl font-semibold text-indigo-700 flex items-start">🛒&nbsp; Vocês vendem em atacado?</h2>
+      <p class="text-gray-700 leading-relaxed">
+        Não. Trabalhamos exclusivamente com <strong>varejo</strong>.
+      </p>
+      <div class="text-sm bg-red-100 text-red-700 px-4 py-2 rounded border-l-4 border-red-500">
+        ⚠️ <strong>Importante:</strong> Alguma coisa importante pra colocar aqui.
+      </div>
+    </div>
+
+    <!-- Entrega -->
+    <div class="space-y-2">
+      <h2 class="text-xl font-semibold text-indigo-700 flex items-start">🚚&nbsp; Quais os prazos de entrega?</h2>
+      <p class="text-gray-700 leading-relaxed">
+        Todas as informações sobre prazos de entrega por <strong>Correios</strong> e por <strong>Motoboy</strong> estão disponíveis na página de entrega.
+      </p>
+    </div>
+
+    <!-- Trocas -->
+    <div class="space-y-4">
+      <h2 class="text-xl font-semibold text-indigo-700 flex items-start">🔁&nbsp; Quantos dias eu tenho para trocar?</h2>
+      <p class="text-gray-700 leading-relaxed">
+        O prazo de troca é de até <strong>7 dias corridos</strong>, desde que a peça esteja com a <strong>etiqueta original</strong>.
+      </p>
+
+      <!-- Loja Física -->
+      <div class="bg-gray-50 border border-gray-200 p-4 rounded">
+        <h3 class="font-semibold text-gray-800 mb-1">📍 Loja Física</h3>
+        <p class="text-gray-700 text-sm">
+          Não realizamos troca de:
+          <strong>biquínis</strong>, <strong>peças íntimas</strong>, <strong>acessórios</strong>, <strong>peças em liquidação</strong> ou <strong>brancas</strong>.
+        </p>
+      </div>
+
+      <!-- Site -->
+      <div class="bg-gray-50 border border-gray-200 p-4 rounded">
+        <h3 class="font-semibold text-gray-800 mb-1">🛒 Site</h3>
+        <p class="text-gray-700 text-sm">
+          A solicitação de troca deve ser feita por <strong>e-mail</strong>.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</section>
+{% endblock %}
