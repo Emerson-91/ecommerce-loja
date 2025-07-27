@@ -27,7 +27,7 @@
                 <h3 class="font-semibold text-gray-900 mb-2 truncate">{{ produto.nome }}</h3>
                     {% if produto.desconto and produto.desconto > 0 and produto.preco_promocional %}
                     <p class="text-sm text-gray-500 mb-1">
-                        <span class="line-through !text-decoration-line-through">R$ {{ produto.valor_venda|floatformat:2 }}</span>
+                        <span class="linha-riscada">R$ {{ produto.valor_venda|floatformat:2 }}</span>
                     </p>
                     <p class="text-indigo-600 font-bold text-lg">R$ {{ produto.preco_promocional|floatformat:2 }}</p>
                     {% else %}

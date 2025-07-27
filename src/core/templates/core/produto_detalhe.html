@@ -46,7 +46,7 @@
           {% if preco_promocional and preco_promocional < produto.valor_venda %}
             <p class="text-sm font-semibold text-green-700">{{ desconto }}% OFF</p>
             <p class="text-3xl font-bold text-red-600">R$ {{ preco_promocional|floatformat:2 }}</p>
-            <p class="text-base text-gray-400 line-through">R$ {{ produto.valor_venda|floatformat:2 }}</p>
+            <p class="text-base text-gray-400 linha-riscada">R$ {{ produto.valor_venda|floatformat:2 }}</p>
           {% else %}
             <p class="text-3xl font-bold text-gray-900">R$ {{ produto.valor_venda|floatformat:2 }}</p>
           {% endif %}
