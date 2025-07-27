@@ -1,0 +1,64 @@
+﻿{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Formas de Pagamento - Yvy Lima Collection{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12 max-w-4xl text-gray-800">
+  <h1 class="text-3xl font-bold mb-8 text-indigo-700">Formas de Pagamento</h1>
+
+  <section class="mb-8">
+    <p class="mb-4">
+      Na <strong>Yvy Lima Collection</strong>, oferecemos diversas formas de pagamento seguras e práticas para facilitar sua compra. Confira abaixo todas as opções disponíveis:
+    </p>
+
+    <ul class="list-disc list-inside space-y-2">
+      <li><strong>Pix</strong>: com <span class="text-green-600 font-semibold">5% de desconto</span> no valor total.</li>
+      <li><strong>Cartão de Crédito</strong>: aceitamos as principais bandeiras:
+        <ul class="list-disc list-inside ml-5 mt-1">
+          <li>Visa</li>
+          <li>Mastercard</li>
+          <li>American Express</li>
+          <li>Elo</li>
+        </ul>
+      </li>
+    </ul>
+
+    <p class="mt-4">
+      As compras no <strong>cartão de crédito</strong> podem ser parceladas em até <strong>3x sem juros</strong>.
+    </p>
+  </section>
+
+  <section class="mb-8">
+    <h2 class="text-xl font-semibold mb-3">Segurança</h2>
+    <p>
+      Todas as transações de pagamento são processadas em ambiente seguro e com dados criptografados. As análises de segurança são feitas automaticamente por empresas especializadas.
+    </p>
+    <p class="mt-2">
+      Normalmente a aprovação do pagamento acontece em poucos minutos, mas pode levar até <strong>48 horas</strong> em casos excepcionais.
+    </p>
+  </section>
+
+  <section class="mb-8">
+    <h2 class="text-xl font-semibold mb-3">Atenção</h2>
+    <ul class="list-disc list-inside space-y-2">
+      <li>Em caso de divergência de dados ou suspeita de fraude, o pedido pode ser automaticamente cancelado. Nesse caso, nenhum valor será cobrado.</li>
+      <li>O limite do cartão de crédito é determinado pela administradora. O valor total da compra é considerado (e não o valor das parcelas). Se o limite for excedido, o pedido pode ser recusado pela operadora do cartão.</li>
+    </ul>
+  </section>
+
+  <section class="mb-8">
+    <h2 class="text-xl font-semibold mb-3">Descontos Não Acumulativos</h2>
+    <p>
+      Os descontos oferecidos por meio de <strong>promoções, cupons, vouchers ou créditos</strong> não são cumulativos.
+    </p>
+    <p class="mt-2">
+      Por exemplo: se o cliente possui um cupom de desconto e também deseja pagar via Pix (que oferece 5% de desconto), será aplicado apenas um dos descontos, o que oferecer a melhor vantagem no momento da compra.
+    </p>
+  </section>
+
+  <p class="text-sm text-gray-600 mt-12 border-t pt-4">
+    Em caso de dúvidas sobre os métodos de pagamento, entre em contato conosco pelo e-mail: <strong>atendimento@yvylimacollection.com.br</strong>
+  </p>
+</div>
+{% endblock %}

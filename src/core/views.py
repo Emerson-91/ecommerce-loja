@@ -4,20 +4,34 @@ from produtos.models import Produto, Categoria
 
 
 def home(request):
-    # Ou algum filtro para produtos em destaque
-    produtos = Produto.objects.filter(ativo=True)
+    produtos = Produto.objects.filter(ativo=True).order_by('-id')[:12]
 
     for produto in produtos:
         if produto.desconto_maximo and produto.desconto_maximo > 0:
             produto.preco_com_desconto = produto.valor_venda * \
                 (1 - produto.desconto_maximo / 100)
+            # 👈 ESSA LINHA FALTAVA
+            produto.desconto = round(produto.desconto_maximo)
         else:
             produto.preco_com_desconto = produto.valor_venda
+            produto.desconto = 0
 
     context = {
         'produtos': produtos,
     }
     return render(request, 'core/home.html', context)
+
+
+def sobre(request):
+    return render(request, 'core/sobre.html')
+
+
+def politica_trocas(request):
+    return render(request, 'core/politica_trocas.html')
+
+
+def politica_pagamento(request):
+    return render(request, 'core/politica_pagamento.html')
 
 
 def sobre(request):

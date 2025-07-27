@@ -1,0 +1,22 @@
+{
+  "name": "ecommerce-loja",
+  "version": "1.0.0",
+  "description": "loja de roupas com python e Django",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Emerson-91/ecommerce-loja.git"
+  },
+  "author": "Emerson",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Emerson-91/ecommerce-loja/issues"
+  },
+  "homepage": "https://github.com/Emerson-91/ecommerce-loja#readme",
+  "devDependencies": {
+    "rimraf": "^5.0.10"
+  }
+}

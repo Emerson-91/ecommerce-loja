@@ -9,6 +9,9 @@ WORKDIR /app/src
 # Copia o requirements.txt que está na raiz (fora do src)
 COPY requirements.txt /app/requirements.txt
 
+#ATUALIZA O PIP
+RUN pip install --no-cache-dir --upgrade pip
+
 # Instala as libs
 RUN pip install --no-cache-dir -r /app/requirements.txt
 

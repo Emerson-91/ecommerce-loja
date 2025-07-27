@@ -159,10 +159,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     attachRemoveHandlers();
 
-    // Validação automática do campo "tamanho": permite apenas P, M, G, X, 0-9 (em maiúsculo)
+    // Validação automática do campo "tamanho": permite apenas U,P, M, G, X, 0-9 (em maiúsculo)
     document.addEventListener('input', function (e) {
         if (e.target.name && e.target.name.includes('tamanho')) {
-            let valor = e.target.value.toUpperCase().replace(/[^PMGX0-9]/g, '').slice(0, 3);
+            let valor = e.target.value.toUpperCase().replace(/[^UPMGX0-9]/g, '').slice(0, 3);
             e.target.value = valor;
         }
     });

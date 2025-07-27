@@ -1,8 +1,9 @@
 ﻿{% load static %}
+
 <script src="{% static 'js/carousel.js' %}"></script>
 
-<footer class="bg-white border-t mt-12 ">
-  <div class="container mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-3 gap-8 text-gray-700 text-sm">
+<footer class="bg-white border-t mt-12">
+  <div class="container mx-auto px-6 py-10 grid grid-cols-1 md:grid-cols-4 gap-8 text-gray-700 text-sm">
     
     <!-- Coluna 1: Logo e descrição -->
     <div>
@@ -10,27 +11,43 @@
       <p>Yvy Lima Collection é sua loja de moda com estilo, qualidade e preço justo. Acompanhe as tendências com a gente!</p>
     </div>
 
-    <!-- Coluna 2: Links úteis -->
+    <!-- Coluna 2: Institucional -->
     <div>
       <h3 class="font-semibold mb-2 text-gray-900">Institucional</h3>
       <ul class="space-y-1">
         <li><a href="{% url 'core:sobre' %}" class="hover:text-indigo-600">Sobre</a></li>
         <li><a href="{% url 'core:contato' %}" class="hover:text-indigo-600">Contato</a></li>
-        <li><a href="" class="hover:text-indigo-600">Perguntas Frequentes</a></li>
-        <li><a href="{% url 'core:politica_privacidade' %}" class="hover:text-indigo-600">Política de Privacidade</a></li>
+        <li><a href="#" class="hover:text-indigo-600">Perguntas Frequentes</a></li>
       </ul>
     </div>
 
-    <!-- Coluna 3: Redes sociais -->
+    <!-- Coluna 3: Políticas -->
+    <div>
+      <h3 class="font-semibold mb-2 text-gray-900">Políticas</h3>
+      <ul class="space-y-1">
+        <li><a href="{% url 'core:politica_pagamento' %}" class="hover:text-indigo-600">Política de Pagamento</a></li>
+        <li><a href="{% url 'core:politica_trocas' %}" class="hover:text-indigo-600">Política de Troca e Devolução</a></li>
+        <li><a href="{% url 'core:politica_privacidade' %}" class="hover:text-indigo-600">Política de Privacidade</a></li>
+
+      </ul>
+    </div>
+
+    <!-- Coluna 4: Redes Sociais + Cartões -->
     <div>
       <h3 class="font-semibold mb-2 text-gray-900">Redes Sociais</h3>
-      <div class="flex space-x-4">
-        <a href="#" class="hover:text-indigo-600"><i class="fab fa-facebook fa-lg"></i></a>
+      <div class="flex space-x-4 mb-4">
         <a href="https://www.instagram.com/yvylima.collection/" target="_blank" class="hover:text-indigo-600"><i class="fab fa-instagram fa-lg"></i></a>
         <a href="#" class="hover:text-indigo-600"><i class="fab fa-whatsapp fa-lg"></i></a>
       </div>
-    </div>
 
+      <h3 class="font-semibold mb-2 text-gray-900">Formas de Pagamento</h3>
+      <div class="flex flex-wrap gap-2">
+        <img src="{% static 'img/pagamentos/visa.svg' %}" alt="Visa" class="h-6">
+        <img src="{% static 'img/pagamentos/mastercard.svg' %}" alt="Mastercard" class="h-6">
+        <img src="{% static 'img/pagamentos/pagseguro.svg' %}" alt="Pagseguro" class="h-6">
+        <img src="{% static 'img/pagamentos/pix.svg' %}" alt="Pix" class="h-6">
+      </div>
+    </div>
   </div>
 
   <div class="text-center text-gray-500 text-xs py-4 border-t">

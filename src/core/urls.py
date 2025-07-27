@@ -7,6 +7,9 @@ app_name = 'core'
 urlpatterns = [
     path('', views.home, name='home'),
     path('sobre/', views.sobre, name='sobre'),
+    path('politica-trocas/', views.politica_trocas, name='politica_trocas'),
+    path('politica-pagamento/', views.politica_pagamento,
+         name='politica_pagamento'),
     path('contato/', views.contato, name='contato'),
     path('politica-privacidade/', views.politica_privacidade,
          name='politica_privacidade'),

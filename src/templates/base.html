@@ -6,16 +6,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{% block title %}Yvy Lima Collection{% endblock %}</title>
+
+  <!-- Tailwind CSS compilado -->
   <link href="{% static 'css/dist/styles.css' %}" rel="stylesheet" />
   <link href="{% static 'css/dist/estilo.css' %}" rel="stylesheet" />
-  
-  <link
-  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
-  rel="stylesheet"
-/>
-</head>
-<body class="bg-gray-50 font-sans">
 
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet" />
+</head>
+<body class="bg-gray-50 font-sans relative">
+
+<!-- HEADER -->
 <header class="bg-white shadow sticky top-0 z-50">
   <div class="container mx-auto flex justify-between items-center py-4 px-6 max-h-20">
 
@@ -24,10 +25,10 @@
       <img src="{% static 'img/logo-loja.png' %}" alt="Logo Moda Fashion" class="h-16" />
     </a>
 
-    <!-- Menu principal + Menu ícones juntos -->
+    <!-- Navegação -->
     <nav class="flex items-center space-x-10">
 
-      <!-- Menu principal: só md+ -->
+      <!-- Links principais -->
       <div class="hidden md:flex space-x-8 font-medium text-gray-700">
         <a href="{% url 'core:masculino' %}" class="hover:text-indigo-600 transition">Masculino</a>
         <a href="{% url 'core:feminino' %}" class="hover:text-indigo-600 transition">Feminino</a>
@@ -36,7 +37,7 @@
         <a href="{% url 'core:ofertas' %}" class="hover:text-indigo-600 transition">Ofertas</a>
       </div>
 
-      <!-- Menu direito: ícones todos juntos, visíveis sempre -->
+      <!-- Ícones -->
       <div class="flex items-center space-x-6 text-gray-600">
         <a href="#" title="Minha Conta" class="hover:text-indigo-600 transition">
           <i class="fas fa-user fa-lg"></i>
@@ -45,18 +46,13 @@
         <a href="#" title="Meu Carrinho" class="relative hover:text-indigo-600 transition">
           <i class="fas fa-shopping-cart fa-lg"></i>
           {% if carrinho_quantidade and carrinho_quantidade > 0 %}
-          <span
-            class="absolute -top-2 -right-2 bg-indigo-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center font-bold"
-            >{{ carrinho_quantidade }}</span
-          >
+          <span class="absolute -top-2 -right-2 bg-indigo-600 text-white rounded-full text-xs w-5 h-5 flex items-center justify-center font-bold">
+            {{ carrinho_quantidade }}
+          </span>
           {% endif %}
         </a>
 
-        <a
-          href="{% url 'administracao:painel_dashboard' %}"
-          title="Administração"
-          class="hover:text-indigo-600 transition"
-        >
+        <a href="{% url 'administracao:painel_dashboard' %}" title="Administração" class="hover:text-indigo-600 transition">
           <i class="fas fa-cog fa-lg"></i>
         </a>
       </div>
@@ -65,10 +61,12 @@
   </div>
 </header>
 
-<main class="min-h-[80vh] container mx-auto px-6 py-8">
+<!-- CONTEÚDO PRINCIPAL -->
+<main class="min-h-[80vh] container mx-auto px-6 py-8 relative z-0">
   {% block content %}{% endblock %}
 </main>
 
+<!-- FOOTER -->
 {% include 'footer.html' %}
 
 </body>

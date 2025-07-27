@@ -4,19 +4,25 @@
 {% block title %}{{ produto.nome }} - Detalhes{% endblock %}
 
 {% block content %}
+<style>
+  .cor-selecionada {
+    box-shadow: 0 0 0 4px #4f46e5;
+    outline: 2px solid white;
+    transform: scale(1.1);
+  }
+</style>
+
 <div class="container mx-auto px-6 py-8">
   <div class="flex flex-col md:flex-row gap-8">
 
     <!-- Imagens do produto -->
     <div class="md:w-1/2">
-      <!-- Imagem principal -->
       {% if produto.imagem_principal %}
         <img id="main-img" src="{{ produto.imagem_principal.url }}" alt="{{ produto.nome }}" class="w-full rounded-lg shadow-lg object-contain max-h-[500px]">
       {% else %}
         <img id="main-img" src="{% static 'img/placeholder.png' %}" alt="Sem imagem" class="w-full rounded-lg shadow-lg object-contain max-h-[500px]">
       {% endif %}
 
-      <!-- Miniaturas -->
       <div class="flex gap-3 mt-4 overflow-x-auto">
         {% for img in produto.imagens.all %}
           <img src="{{ img.imagem.url }}" alt="{{ produto.nome }}" class="w-20 h-20 object-cover rounded cursor-pointer border-2 border-gray-200 hover:border-indigo-600" onclick="document.getElementById('main-img').src='{{ img.imagem.url }}'">
@@ -24,7 +30,7 @@
       </div>
     </div>
 
-    <!-- Detalhes do produto -->
+    <!-- Detalhes -->
     <div class="md:w-1/2 flex flex-col justify-between">
       <div>
         <h1 class="text-3xl font-bold text-gray-900">{{ produto.nome }}</h1>
@@ -32,36 +38,24 @@
         {% if produto.marca %}
         <p class="text-sm text-gray-600 mt-1">Marca: {{ produto.marca.nome }}</p>
         {% endif %}
-
         {% if produto.categoria %}
         <p class="text-sm text-gray-600">Categoria: {{ produto.categoria.nome }}</p>
         {% endif %}
 
-        <!-- Preço com destaque promocional -->
         <div class="mt-4 space-y-1">
           {% if preco_promocional and preco_promocional < produto.valor_venda %}
-            <p class="text-sm font-semibold text-green-700">
-              {{ desconto }}% OFF
-            </p>
-            <p class="text-3xl font-bold text-red-600">
-              R$ {{ preco_promocional|floatformat:2 }}
-            </p>
-            <p class="text-base text-gray-400 line-through">
-              R$ {{ produto.valor_venda|floatformat:2 }}
-            </p>
+            <p class="text-sm font-semibold text-green-700">{{ desconto }}% OFF</p>
+            <p class="text-3xl font-bold text-red-600">R$ {{ preco_promocional|floatformat:2 }}</p>
+            <p class="text-base text-gray-400 line-through">R$ {{ produto.valor_venda|floatformat:2 }}</p>
           {% else %}
-            <p class="text-3xl font-bold text-gray-900">
-              R$ {{ produto.valor_venda|floatformat:2 }}
-            </p>
+            <p class="text-3xl font-bold text-gray-900">R$ {{ produto.valor_venda|floatformat:2 }}</p>
           {% endif %}
         </div>
 
-        <!-- Descrição -->
         <div class="mt-6 text-gray-700 whitespace-pre-line">
           {{ produto.descricao|default:"Sem descrição disponível." }}
         </div>
 
-        <!-- Variações -->
         {% if produto.variacoes.exists %}
         <form method="post" action="" class="mt-6">
           {% csrf_token %}
@@ -75,9 +69,10 @@
                 {% with cor_variacao=cor.list.0 %}
                   <button
                     type="button"
-                    class="cor-btn w-8 h-8 rounded-full border-2 border-gray-300 hover:border-indigo-600 focus:outline-none"
+                    class="cor-btn w-8 h-8 rounded-full border-2 border-gray-300 hover:border-indigo-600 focus:outline-none transition-transform"
                     style="background-color: {{ cor.grouper }};"
                     data-cor="{{ cor.grouper }}"
+                    data-imagem="{% if cor_variacao.imagem_cor %}{{ cor_variacao.imagem_cor.url }}{% endif %}"
                     aria-label="Selecionar cor {{ cor.grouper }}"
                   ></button>
                 {% endwith %}
@@ -104,7 +99,6 @@
             </div>
           </div>
 
-          <!-- Inputs hidden para cor e tamanho -->
           <input type="hidden" name="cor" id="input-cor" required>
           <input type="hidden" name="tamanho" id="input-tamanho" required>
 
@@ -145,13 +139,14 @@
   {% endif %}
 </div>
 
+<!-- JavaScript -->
 <script>
-  // Variáveis globais
   const coresBtns = document.querySelectorAll('.cor-btn');
   const tamanhosBtns = document.querySelectorAll('.tamanho-btn');
   const inputCor = document.getElementById('input-cor');
   const inputTamanho = document.getElementById('input-tamanho');
   const btnAddCarrinho = document.getElementById('btn-add-carrinho');
+  const mainImg = document.getElementById('main-img');
 
   let corSelecionada = null;
   let tamanhoSelecionado = null;
@@ -159,13 +154,13 @@
   function atualizarTamanhos() {
     tamanhosBtns.forEach(btn => {
       const cor = btn.dataset.cor;
-      if(cor === corSelecionada && btn.dataset.disponivel === 'true') {
+      if (cor === corSelecionada && btn.dataset.disponivel === 'true') {
         btn.disabled = false;
         btn.classList.remove('opacity-50');
       } else {
         btn.disabled = true;
         btn.classList.add('opacity-50');
-        if(btn.classList.contains('selected')) {
+        if (btn.classList.contains('selected')) {
           btn.classList.remove('selected');
           tamanhoSelecionado = null;
           inputTamanho.value = '';
@@ -178,33 +173,31 @@
     btnAddCarrinho.disabled = !(corSelecionada && tamanhoSelecionado);
   }
 
-  // Seleção da cor
   coresBtns.forEach(btn => {
     btn.addEventListener('click', () => {
-      // Remove seleção anterior
-      coresBtns.forEach(b => b.classList.remove('ring-4', 'ring-indigo-500'));
-      btn.classList.add('ring-4', 'ring-indigo-500');
+      coresBtns.forEach(b => b.classList.remove('cor-selecionada'));
+      btn.classList.add('cor-selecionada');
 
       corSelecionada = btn.dataset.cor;
       inputCor.value = corSelecionada;
 
-      // Atualiza tamanhos disponíveis
+      const novaImagem = btn.dataset.imagem;
+      if (novaImagem) {
+        mainImg.src = novaImagem;
+      }
+
       atualizarTamanhos();
 
-      // Reset seleção tamanho
       tamanhoSelecionado = null;
       inputTamanho.value = '';
-
       verificarBotaoEnviar();
     });
   });
 
-  // Seleção do tamanho
   tamanhosBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       if (btn.disabled) return;
 
-      // Remove seleção anterior
       tamanhosBtns.forEach(b => b.classList.remove('bg-indigo-600', 'text-white'));
       btn.classList.add('bg-indigo-600', 'text-white');
 

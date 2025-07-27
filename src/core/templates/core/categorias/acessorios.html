@@ -9,30 +9,34 @@
 
     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {% for produto in produtos %}
-            <a href="{% url 'core:produto_detalhe' produto.id %}" class="relative block border border-gray-200 rounded-lg shadow p-4 bg-white hover:shadow-lg transition">
+            <a href="{% url 'core:produto_detalhe' produto.id %}" class="relative block bg-white rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300 no-underline">
 
-                {% if produto.desconto > 0 %}
+                {% if produto.desconto and produto.desconto > 0 %}
                 <div class="absolute top-2 left-0 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-tr-lg rounded-br-lg shadow-lg z-10">
-                    {{ produto.desconto }}% OFF
+                {{ produto.desconto }}% OFF
                 </div>
                 {% endif %}
 
                 {% if produto.imagem_principal %}
-                    <img src="{{ produto.imagem_principal.url }}" alt="{{ produto.nome }}" class="w-full h-48 object-cover rounded">
+                <img src="{{ produto.imagem_principal.url }}" alt="{{ produto.nome }}" class="w-full h-48 object-cover" />
                 {% else %}
-                    <img src="{% static 'img/placeholder.png' %}" alt="Sem imagem" class="w-full h-48 object-cover rounded">
+                <img src="{% static 'img/placeholder.png' %}" alt="Sem imagem" class="w-full h-48 object-cover" />
                 {% endif %}
 
-                <h2 class="text-lg font-semibold mt-2">{{ produto.nome }}</h2>
-                <p class="text-gray-600 text-sm">
-                    {% if produto.desconto > 0 and produto.preco_promocional %}
-                    <span class="line-through text-gray-400 mr-2">R$ {{ produto.valor_venda|floatformat:2 }}</span>
-                    <span class="text-red-600 font-semibold">R$ {{ produto.preco_promocional|floatformat:2 }}</span>
+                <div class="p-4">
+                    <h3 class="font-semibold text-gray-900 mb-2 truncate">{{ produto.nome }}</h3>
+                    {% if produto.desconto and produto.desconto > 0 and produto.preco_promocional %}
+                    <p class="text-sm text-gray-500 mb-1">
+                        <span class="line-through">R$ {{ produto.valor_venda|floatformat:2 }}</span>
+                    </p>
+                    <p class="text-indigo-600 font-bold text-lg">R$ {{ produto.preco_promocional|floatformat:2 }}</p>
                     {% else %}
-                    R$ {{ produto.valor_venda|floatformat:2 }}
+                    <p class="text-indigo-600 font-bold text-lg">R$ {{ produto.valor_venda|floatformat:2 }}</p>
                     {% endif %}
-                </p>
+                </div>
             </a>
+            {% empty %}
+            <p class="text-center text-gray-500 col-span-full">Nenhum produto disponível.</p>
         {% endfor %}
     </div>
 </section>
